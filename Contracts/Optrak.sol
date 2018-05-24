@@ -30,7 +30,7 @@ contract Optrak is Ownable {
     }
 
     // Current function assumes one provider corresponds to one pubkey and overwrites pubkey if provider exists
-    function addProvider(string provider, string pubkey) public onlyOwner() {
+    function addProvider(string provider, string pubkey) public onlyOwner {
         // bytes memory tempExistingProvider = bytes(provider2pubkey[provider]);
         // if (tempExistingProvider.length == 0) {
             // index2provider[totalProviderCount] = provider;
@@ -51,7 +51,7 @@ contract Optrak is Ownable {
         return provider2meta[provider][metaName];
     }
 
-    function addMetaData(string provider, string metaName, string content, bool overwrite) public onlyOwner() returns(bool){
+    function addMetaData(string provider, string metaName, string content, bool overwrite) public onlyOwner returns(bool){
         
         bytes memory tempExistingMeta = bytes(provider2meta[provider][metaName]);
         if (tempExistingMeta.length == 0) {
@@ -71,7 +71,7 @@ contract Optrak is Ownable {
         return metadata2access[sharer][metaName][sharee];
     }
 
-    function updateMetaDataAccess(string sharer, string metaName, string sharee, bool access) public onlyOwner() returns(bool) {
+    function updateMetaDataAccess(string sharer, string metaName, string sharee, bool access) public onlyOwner returns(bool) {
         bytes memory tempExistingMeta = bytes(getMetaData(sharer, metaName));
         if (tempExistingMeta.length == 0) return false;
         metadata2access[sharer][metaName][sharee] = access;
