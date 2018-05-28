@@ -10,7 +10,7 @@ else{
 
 //not entirely sure what parameters the contract creation takes
 let abi; //get ABI?
-let userAddress;
+let userAddress = web3.eth.accounts[0];
 let optrak=new web3.eth.Contract(abi, userAddress); //might want to do this with a JSON interface
 
 let accountCheck = intervalCheck(function() {
