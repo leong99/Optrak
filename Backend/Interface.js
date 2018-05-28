@@ -9,7 +9,7 @@ else{
 }
 
 //not entirely sure what parameters the contract creation takes
-let abi; //get ABI?
+let abi; //ABI retrieval when our final smart contract is written
 let userAddress = web3.eth.accounts[0];
 let optrak=new web3.eth.Contract(abi, userAddress); //might want to do this with a JSON interface
 
