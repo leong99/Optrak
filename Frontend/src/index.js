@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './Components/App';
 import SignIn from './Components/SignIn';
 import SignUp from './Components/SignUp';
+import Temp from './Components/Temp';
 import {BrowserRouter, Route, browserHistory} from 'react-router-dom';
 import {firebaseApp} from './firebase';
 
@@ -21,6 +22,7 @@ ReactDOM.render(
             <Route path="/app" component={App} />
             <Route path="/signin" component={SignIn}/>
             <Route path="/signup" component={SignUp}/>
+            <Route path="/temp" component={Temp}/>
         </div>
     </BrowserRouter>, document.getElementById('root')
 );
