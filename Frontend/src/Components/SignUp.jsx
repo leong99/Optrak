@@ -5,7 +5,9 @@ import 'react-dropdown/style.css';
 import Web3 from 'web3';
 
 const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-//web3.eth.getAccounts().then(console.log);
+let account = web3.eth.getAccounts().then(e => {return console.log(e[0]);});
+console.log(account);
+
 
 
 
