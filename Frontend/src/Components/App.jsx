@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { web3 } from '../Components/SignUp'
 import { firebaseApp } from '../firebase'
 import { Link, BrowserRouter, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 
 
@@ -22,6 +23,12 @@ class App extends Component {
         </div>    
         );
     }
+
 }
 
-export default App;
+function mapStateToProps(state) {
+    console.log('state', state);
+    return {}
+}
+
+export default connect(mapStateToProps, null)(App);
