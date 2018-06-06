@@ -35,11 +35,12 @@ class SignUp extends Component {
             name: '',
             provStatus: false,
             email: '',
+            btnTitle: 'User Type',
             error: {
                 message: ''
             }
         };
-        //this._onSelect = this._onSelect.bind(this);
+        this._onSelect = this._onSelect.bind(this);
         
     }
     
@@ -66,10 +67,17 @@ class SignUp extends Component {
             this.setState({error});
         });
     }
-   /* _onSelect (option) {
-        console.log('You selected ', option.label)
-        this.setState({status: option.value})
-      }*/
+    _onSelect (option) {
+        console.log('You selected ', option)
+        if(option.eventKey == "Patient") {
+            this.setState({btnTitle: option});
+        }
+        else {
+            this.setState({provStatus: true});
+            this.setState({btnTitle: option});
+        }
+
+      }
 
     render() {
         return (
@@ -78,13 +86,13 @@ class SignUp extends Component {
             <div className="form-group">
                 <DropdownButton
                 bsStyle={'primary'}
-                title={"User Type"}
+                title={this.state.btnTitle}
                 id={`dropdown-basic-1`}
                 >
-                <MenuItem eventKey="Patient" onSelect={(e)=>{this.setState({provStatus: false});}}>
+                <MenuItem eventKey="Patient" onSelect={this._onSelect}>
                 Patient
                 </MenuItem>
-                <MenuItem eventKey="Provider" onSelect={(e)=>{this.setState({provStatus: true});}}>
+                <MenuItem eventKey="Provider" onSelect={this._onSelect}>
                 Provider
                 </MenuItem>
                 </DropdownButton>

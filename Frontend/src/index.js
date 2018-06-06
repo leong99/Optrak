@@ -28,7 +28,7 @@ firebaseApp.auth().onAuthStateChanged(user => {
     }
     else {
         console.log('user has signed out, or still needs to sign in');
-        return history.push('/signin');
+        //return history.push('/signin');
     }
 })
 
