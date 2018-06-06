@@ -13,17 +13,19 @@ class SignIn extends Component {
             }
         }
     }
-    signIn(){
+    signIn = async() => {
         console.log('this.state', this.state);
         const {email, password}=this.state;
-        firebaseApp.auth().signInWithEmailAndPassword(email, password).catch(error =>{
-                this.setState({error})
-            })
+        firebaseApp.auth().signInWithEmailAndPassword(email, password).then(user => {
+            this.props.history.push('./app');
+        }).catch(error => {
+            this.setState({error});
+        });
     }
 
     render() {
         return (
-            <div className="form-inline">
+            <form inline="true">
                 <h2>Sign in to Optrak</h2>
                 <div className="form-group">
                     <input
@@ -40,12 +42,12 @@ class SignIn extends Component {
                     type="button"
                     onClick={() => this.signIn()}
                     >
-                    Complete Registration
+                    Sign In
                     </button>
                 </div>
                 <div>{this.state.error.message}</div>
                 <div><Link to={'/signup'}> Sign up instead </Link> </div>
-            </div>
+            </form>
             );
     }
 }
