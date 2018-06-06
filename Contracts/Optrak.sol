@@ -5,10 +5,13 @@ import "./Ownable.sol";
 contract Optrak is Ownable {
     // -------------------- Provider Registry ----------------------------------
     mapping(string=>string) provider2pubkey;
+    
     // uint public totalProviderCount;
     // todo: save provider index and create an actual provider-pubkey object in server code
     // mapping(uint=>string) index2provider; // hide this mapping so it's difficult to retrieve providers without index
     // -------------------- End of Provider Registry ---------------------------
+    
+    mapping(string=>mapping(string=>bool)) isProvider; // {provider: {pubkey: patient/provider}}
 
     // -------------------- Shared Meta Data -----------------------------------
     mapping(string=>mapping(string=>string)) provider2meta; // {provider: {type/name: api/pointer}}
@@ -29,14 +32,18 @@ contract Optrak is Ownable {
         return provider2pubkey[provider];
     }
 
-    // Current function assumes one provider corresponds to one pubkey and overwrites pubkey if provider exists
-    function addProvider(string provider, string pubkey) public onlyOwner {
-        // bytes memory tempExistingProvider = bytes(provider2pubkey[provider]);
-        // if (tempExistingProvider.length == 0) {
-            // index2provider[totalProviderCount] = provider;
-            // ++totalProviderCount;
-        // }
-        provider2pubkey[provider] = pubkey;
+    // Function returns a boolean so when interacting with web3 the frontend is aware
+    // if a user has already registered or not
+    function addProvider(string provider, string pubkey, bool provStatus) public onlyOwner returns (bool){
+         
+        if (bytes(provider2pubkey[provider]).length <= 0) { //ensures a
+         //provider can only register once
+         //may need to update when use cases are developed further
+            provider2pubkey[provider] = pubkey;
+            isProvider[provider][pubkey] = provStatus;
+            return true;
+         }
+        return false;
     }
 
     function getProviderMetaCount(string provider) public view returns(uint) {
