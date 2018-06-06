@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { web3 } from '../Components/SignUp'
 import { firebaseApp } from '../firebase'
-import { Link, BrowserRouter, Route } from 'react-router-dom';
+import { Link, BrowserRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 
@@ -14,16 +14,21 @@ class App extends Component {
     }
 
     render() {
-        return (
-        <div> App 
-            <button className="btn btn-danger" onClick={() => this.signOut()}>
-            Sign Out
-            </button>
+        const user = firebaseApp.auth().onAuthStateChanged(user => {
+           if(!user) {
+               return this.props.history.push('/signin');
+           }
+        });
+        console.log(user);
+            
+            return(<div> App 
+                <button className="btn btn-danger" onClick={() => this.signOut()}>
+                Sign Out
+                </button>
+    
+                </div>);
 
-        </div>    
-        );
-    }
-
+}
 }
 
 function mapStateToProps(state) {
