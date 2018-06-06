@@ -1,3 +1,4 @@
+import { createBrowserHistory } from 'history';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './Components/App';
@@ -8,11 +9,14 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import reducer from './reducers'
 import {logUser} from './actions';
+import { push, createHistory } from 'react-router-redux';
+
 
 import {firebaseApp} from './firebase';
-import history from './history';
+//import history from './history';
 
 const store = createStore(reducer);
+const history = createBrowserHistory();
 
 firebaseApp.auth().onAuthStateChanged(user => {
     
@@ -20,11 +24,11 @@ firebaseApp.auth().onAuthStateChanged(user => {
         console.log('user signed in/up', user);
         const email = user;
         store.dispatch(logUser(email));
-        history.push('/app');
+        return history.push('/app');
     }
     else {
         console.log('user has signed out, or still needs to sign in');
-        history.push('/signin');
+        return history.push('/signin');
     }
 })
 
