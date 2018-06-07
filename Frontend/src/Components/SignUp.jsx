@@ -48,6 +48,7 @@ class SignUp extends Component {
         contract.then(optrakContract => {
             optrakContract.methods.addProvider(this.state.name, this.state.pubkey, this.state.provStatus).send().on('receipt', receipt => {
                 this.props.history.push('./signin');
+                firebaseApp.auth().signOut();
             }).catch(error => {
                 this.setState({error});
             });
@@ -58,16 +59,13 @@ class SignUp extends Component {
     signUp = async() => {
         console.log("this.state", this.state);
         const {email, password} = this.state;
-        firebaseApp.auth().createUserWithEmailAndPassword(email, password).then(async() =>
-        {
-            await this.addProvider();
-            firebaseApp.auth().signOut();
-        }
-        )
-        .catch(error =>
+        if(await this.addProvider()) {
+            firebaseApp.auth().createUserWithEmailAndPassword(email, password).catch(error =>
         {
             this.setState({error});
         });
+        }
+        
     }
     _onSelect (option) {
         console.log('You selected ', option)
