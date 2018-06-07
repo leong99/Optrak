@@ -8,7 +8,7 @@ import { contract } from './SignUp';
 
 
 class App extends Component {
-
+    
     constructor(props) {
         super(props);
         this.state = {
@@ -23,6 +23,7 @@ class App extends Component {
     }
 
     render() {
+        console.log(firebaseApp.auth().currentUser);
         const user = firebaseApp.auth().onAuthStateChanged(user => {
            if(!user) {
                return this.props.history.push('/signin');
@@ -30,7 +31,11 @@ class App extends Component {
         });
         console.log(user);
             
-            return(<div> App 
+            return(<div> 
+                    <h3>Welcome back!</h3>
+                    <div>Add patient history</div>
+                    <div>View patient history</div>
+                    <div>Grant access</div> 
                 <button className="btn btn-danger" onClick={() => this.signOut()}>
                 Sign Out
                 </button>
