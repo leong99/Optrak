@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Dropdown from 'react-dropdown';
-import {firebaseApp} from '../firebase';
+import {firebaseApp, optrakUserRef} from '../firebase';
 import 'react-dropdown/style.css';
 import { Link, BrowserRouter, Route } from 'react-router-dom';
 import {DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, Button} from 'react-bootstrap';
@@ -47,8 +47,16 @@ class SignUp extends Component {
     addProvider = async() => {
         contract.then(optrakContract => {
             optrakContract.methods.addProvider(this.state.name, this.state.pubkey, this.state.provStatus).send().on('receipt', receipt => {
+                console.log(receipt);
+                const {email, password} = this.state;
+                firebaseApp.auth().createUserWithEmailAndPassword(email, password).catch(error =>
+                    {
+                        this.setState({error});
+                    });
+                    optrakUserRef.push(this.state); 
+                    firebaseApp.auth().signOut();
                 this.props.history.push('./signin');
-                firebaseApp.auth().signOut();
+                
             }).catch(error => {
                 this.setState({error});
             });
@@ -58,13 +66,10 @@ class SignUp extends Component {
 
     signUp = async() => {
         console.log("this.state", this.state);
-        const {email, password} = this.state;
-        if(await this.addProvider()) {
-            firebaseApp.auth().createUserWithEmailAndPassword(email, password).catch(error =>
-        {
-            this.setState({error});
-        });
-        }
+       
+        await this.addProvider();
+            
+
         
     }
     _onSelect (option) {
