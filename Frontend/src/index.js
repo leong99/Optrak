@@ -9,7 +9,6 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import reducer from './reducers'
 import {logUser} from './actions';
-import { push, createHistory } from 'react-router-redux';
 
 
 import {firebaseApp} from './firebase';
