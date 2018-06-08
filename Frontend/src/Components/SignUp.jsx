@@ -79,15 +79,34 @@ class SignUp extends Component {
                     optrakContract.methods.addProvider(this.state.name, this.state.pubkey, this.state.provStatus).send().on('receipt', async(receipt) => {
                         console.log(receipt);
                         optrakUserRef.push(this.state);
+                        firebaseApp.auth().onAuthStateChanged(user => {
+                            if(user) {
+                                user.sendEmailVerification()
+                            }
+                        })
                         firebaseApp.auth().signOut();
                         this.props.history.push('./signin');
                     }).catch(error => {
-                        this.setState({error});
+                        if(error) {
+                            console.log(error);
+                            this.setState({error});
+                        firebaseApp.auth().onAuthStateChanged(user => {
+                            if(user) {
+                                user.delete().then(firebaseApp.auth().signOut());
+                                window.location.reload();
+                            }
+                            else {
+                                return null;
+                            }
+                        })
+                        }
+                        
                     })
                 }).catch(error => {
                     this.setState({error});
-                })
+                }) 
             })
+            
         }
     
     }

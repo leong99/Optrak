@@ -6,7 +6,12 @@ import { Link, BrowserRouter, Route } from 'react-router-dom';
 import {DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, Button} from 'react-bootstrap';
 
 class VerifyEmail extends Component{
-    getCurrentUser(){
+
+    constructor(props) {
+        super(props);
+    }
+
+    /*getCurrentUser(){
         firebaseApp.auth().onAuthStateChanged(function(user) {
             if (user) {
               return user;
@@ -15,30 +20,48 @@ class VerifyEmail extends Component{
               return null;
             }
           });
-    }
+    }*/
 
     sendEmail(){ //assumes that the user is the current user
-        let user=this.getCurrentUser();
-        console.log(user); //this does not work for some reason
-        user=firebaseApp.auth().currentUser;
-        user.reload(); //this check has to be in here somewhere to refresh the fact that the email was actually verified
-        console.log(user); //this has worked however, but this does not seem robust
-        user.sendEmailVerification().then(() => {
-            console.log('Email sent successfully') //placeholder function
-        }).catch(() => {
-            console.log('Error sending email') //also placeholder
-        });
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if (user) {
+                console.log(user);
+                user.sendEmailVerification().then(() => {
+                    console.log('Email sent successfully') //placeholder function
+                }).catch(() => {
+                    console.log('Error sending email') //also placeholder
+                });
+                user.reload(); 
+                window.location.reload();
+            }
+        })
+         //this check has to be in here somewhere to refresh the fact that the email was actually verified
+        
+        //console.log(user); //this has worked however, but this does not seem robust 
             
     }
 
-    render() {
+    render() {  
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if(user) {
+                if(user.emailVerified) {
+                    this.props.history.push('./app');
+                }
+            }
+            else {
+                this.props.history.push('./signin');
+            }
+        });
         return (
+            <div>
+                <h1>Please verify your email address before using Optrak</h1>
                 <button className="btn btn-primary" 
                 type="button"
                 onClick={() => this.sendEmail()}
                 >
-                Verify Email
+                Resend Verification
                 </button>
+            </div>
             );
     }
 }

@@ -17,7 +17,13 @@ class SignIn extends Component {
         console.log('this.state', this.state);
         const {email, password}=this.state;
         firebaseApp.auth().signInWithEmailAndPassword(email, password).then(user => {
-            this.props.history.push('./app');
+            if(user.emailVerified) {
+                this.props.history.push('./app');
+            }
+            else {
+                this.props.history.push('./verifyemail');
+            }
+            
         }).catch(error => {
             this.setState({error});
         });
