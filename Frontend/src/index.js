@@ -5,6 +5,7 @@ import App from './Components/App';
 import SignIn from './Components/SignIn';
 import SignUp from './Components/SignUp';
 import VerifyEmail from './Components/VerifyEmail';
+import UpdatePatientHistory from './Components/UpdatePatientHistory';
 import {BrowserRouter, Route, browserHistory, withRouter} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
@@ -40,6 +41,7 @@ ReactDOM.render(
                 <Route path="/signin" component={SignIn}/>
                 <Route path="/signup" component={SignUp}/>
                 <Route path="/verifyemail" component={VerifyEmail}/>
+                <Route path="/updatepatienthistory" component={UpdatePatientHistory}/>
             </div>
         </BrowserRouter>
     </Provider>, document.getElementById('root')

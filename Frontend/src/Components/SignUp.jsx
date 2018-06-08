@@ -48,7 +48,7 @@ class SignUp extends Component {
 
     checkFields() {
         if (this.state.email.length == 0) {
-            this.setState({ error: { message: 'Please enter your public key' } });
+            this.setState({ error: { message: 'Please enter your email' } });
             return false;
         }
         else if (this.state.password.length < 6) {
@@ -177,7 +177,5 @@ class SignUp extends Component {
         );
     }
 }
-
-export { contract };
 
 export default SignUp;
