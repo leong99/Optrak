@@ -22,7 +22,7 @@ class VerifyEmail extends Component{
                 }).catch(() => {
                     console.log('Error sending email') //also placeholder
                 });
-                
+                user.reload(); 
                 window.location.reload();
             }
         })

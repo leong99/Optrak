@@ -178,4 +178,6 @@ class SignUp extends Component {
     }
 }
 
+export { contract };
+
 export default SignUp;
