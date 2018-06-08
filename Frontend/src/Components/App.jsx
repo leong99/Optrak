@@ -33,7 +33,7 @@ class App extends Component {
             
             return(<div> 
                     <h3>Welcome back!</h3>
-                    <div>Add patient history</div>
+                    <div><Link to={'./addPatientHist'}>Add patient history </Link></div>
                     <div>Update patient history</div>
                     <div>View patient history</div>
                     <div>Grant access</div> 
