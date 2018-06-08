@@ -11,16 +11,7 @@ class VerifyEmail extends Component{
         super(props);
     }
 
-    /*getCurrentUser(){
-        firebaseApp.auth().onAuthStateChanged(function(user) {
-            if (user) {
-              return user;
-            } else {
-              // No user is signed in.
-              return null;
-            }
-          });
-    }*/
+    
 
     sendEmail(){ //assumes that the user is the current user
         firebaseApp.auth().onAuthStateChanged(user => {
@@ -31,7 +22,7 @@ class VerifyEmail extends Component{
                 }).catch(() => {
                     console.log('Error sending email') //also placeholder
                 });
-                user.reload(); 
+                
                 window.location.reload();
             }
         })
