@@ -81,7 +81,8 @@ class SignUp extends Component {
                         optrakUserRef.push(this.state);
                         firebaseApp.auth().onAuthStateChanged(user => {
                             if(user) {
-                                user.sendEmailVerification()
+                                user.sendEmailVerification();
+                                user.updateProfile({displayName: this.state.name});
                             }
                         })
                         firebaseApp.auth().signOut();
