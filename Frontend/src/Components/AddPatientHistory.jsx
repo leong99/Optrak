@@ -12,6 +12,7 @@ class AddPatientHistory extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            userName: '',
             patientName: '',
             prescription: '',
             patientDosage: '',
@@ -26,27 +27,43 @@ class AddPatientHistory extends Component {
 
     //Calls smart contract and adds different metadata to it. This is likely not the data that we are going to be using
     //But this can be modified easily to fit any data that need be stored on the blockchain
+    //Current program assumes 1 opioid prescription to a patient
     addPatientInfo = async() => {
         if(this.checkFields()) {
             this.setState({error: {message: 'This will take a minute or two, please be patient'}})
             contract.then(optrakContract => {
                 optrakContract.methods.addMetaData(this.state.patientName, 'Prescription', this.state.prescription, this.state.overwrite).send().on('receipt', receipt => {
                     console.log('Prescription metadata successfully added');
-                    optrakContract.methods.addMetaData(this.state.patientName, 'Dosage', this.state.patientDosage, this.state.overwrite).send().on('receipt', receipt => {
-                        console.log('Dosage metadata successfully added');
-                        optrakContract.methods.addMetaData(this.state.patientName, 'Last Prescribed Date', this.state.lastPrescribedDate, this.state.overwrite).send()
-                        .on('receipt', receipt => {
-                            console.log('Last prescription date metadata successfully added');
-                            optrakContract.methods.addMetaData(this.state.patientName, 'Last Refill Date', this.state.lastRefillDate, this.state.overwrite).send()
+                    optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName, true).send().on('receipt',receipt => {
+                        console.log('Access to this patient\'s prescription metadata granted');
+                        optrakContract.methods.addMetaData(this.state.patientName, 'Dosage', this.state.patientDosage, this.state.overwrite).send().on('receipt', receipt => {
+                            console.log('Dosage metadata successfully added');
+                            optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Dosage', this.state.userName, true).send().on('receipt', receipt => {
+                                 console.log('Access to this patient\'s dosage metadata granted');
+                                 optrakContract.methods.addMetaData(this.state.patientName, 'Last Prescribed Date', this.state.lastPrescribedDate, this.state.overwrite).send()
                             .on('receipt', receipt => {
-                                console.log('Last Refill date transaction successfully received');
-                                alert('Patient info added successfully. Returning to main app page');
-                                this.props.history.push('./app');
-                            }).catch(error => {
-                                this.setState({error: {message: 'Last refill date transaction failed, please refresh and try again'}});
-                            });
-                        }).catch(error => {this.setState({error: {message: 'Last prescription data transaction failed, refresh and try again'}})});
-                    }).catch(error => {this.setState({error: {message: 'Dosage transaction failed, please refresh and try again'}})});
+                                console.log('Last prescription date metadata successfully added');
+                                optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Last Prescribed Date', this.state.userName, true).send().on('receipt', receipt => {
+                                    console.log('Access to this patient\'s last prescription date metadata granted');
+                                    optrakContract.methods.addMetaData(this.state.patientName, 'Last Refill Date', this.state.lastRefillDate, this.state.overwrite).send()
+                                .on('receipt', receipt => {
+                                    optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Last Refill Date', this.state.userName, true).send().on('receipt', receipt => {
+                                        console.log('Access granted to last refill date');
+                                        console.log('Last Refill date transaction successfully received');
+                                        alert('Patient info added successfully. Returning to main app page');
+                                        this.props.history.push('./app');
+                                    }).catch(error => {this.setState({error: {message: 'Refill access transaction failed'}})});
+                                    
+                                }).catch(error => {
+                                    this.setState({error: {message: 'Last refill date transaction failed, please refresh and try again'}});
+                                });
+                                }).catch(error => {this.setState({error: {message: 'Prescription date transaction failed'}})});
+                                
+                            }).catch(error => {this.setState({error: {message: 'Last prescription data transaction failed, refresh and try again'}})});
+                            }).catch(error => {this.setState({error: {message: 'Dosage access transaction failed'}})});  
+                        }).catch(error => {this.setState({error: {message: 'Dosage transaction failed, please refresh and try again'}})});
+                    }).catch(error => {this.setState({error: {message: 'Prescription access transaction failed, please refresh and try again'}})});
+                    
                 }).catch(error => {this.setState({error: {message: 'Prescription transaction failed, please refresh and try again'}})});
                 
                 
@@ -86,6 +103,7 @@ class AddPatientHistory extends Component {
             if(!user) {
                 this.props.history.push('./signin');
             }
+            
         })
         return(
         <div>
@@ -112,6 +130,7 @@ class AddPatientHistory extends Component {
                 </div>
             </form>
             <div>{this.state.error.message}</div>
+            <div><Link to="./app"> Go back to main page </Link></div>
         </div>
         )
     }
