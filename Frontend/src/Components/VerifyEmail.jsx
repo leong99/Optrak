@@ -7,12 +7,6 @@ import {DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, Bu
 
 class VerifyEmail extends Component{
 
-    constructor(props) {
-        super(props);
-    }
-
-    
-
     sendEmail(){ //assumes that the user is the current user
         firebaseApp.auth().onAuthStateChanged(user => {
             if (user) {
