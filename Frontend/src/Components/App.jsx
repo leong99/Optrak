@@ -22,6 +22,8 @@ class App extends Component {
         this.props.history.push('/signin');
     }
 
+    
+
     render() {
         console.log(firebaseApp.auth().currentUser);
         const user = firebaseApp.auth().onAuthStateChanged(user => {
@@ -33,7 +35,7 @@ class App extends Component {
             
             return(<div> 
                     <h3>Welcome back!</h3>
-                    <div><Link to={'./addPatientHist'}>Add patient history </Link></div>
+                    <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
                     <div>Update patient history</div>
                     <div>View patient history</div>
                     <div>Grant access</div> 
