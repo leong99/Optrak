@@ -25,7 +25,7 @@ class ViewPatientHistory extends Component {
 
     isPatient() {
         contract.then(optrakContract => {
-            optrakContract.methods.getProviderMetaCount().call().then(metaCount => {
+            optrakContract.methods.getProviderMetaCount(this.state.patientName).call().then(metaCount => {
                 if(metaCount > 2) {
                     this.setState({error: {message: 'The given patient\'s information does not exist. Please double check your spelling.'}});
                 }
@@ -35,9 +35,19 @@ class ViewPatientHistory extends Component {
         return !(this.state.error.message === 'The given patient\'s information does not exist. Please double check your spelling.')
     }
 
-    
+    onClick() {
+        contract.then(optrakContract =>)
+    }
 
     render() {
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if(user) {
+                return;
+            }
+            else {
+                this.props.history.push('./signin');
+            }
+        })
         return (
             <form role="search">
                 <div>
