@@ -15,7 +15,7 @@ class UpdatePatientHistory extends Component {
             userName:'',
             patientExists: false,
             patientName: '',
-            temp: '',
+            prescription: '',
             patientDosage: '',
             lastPrescribedDate: '',
             lastRefillDate: '',
@@ -93,13 +93,13 @@ class UpdatePatientHistory extends Component {
                         <ControlLabel>
                         </ControlLabel>{' '}
                         <FormControl
-                            onChange={event => this.setState({ temp: event.target.value })}
+                            onChange={event => this.setState({ patientName: event.target.value })}
                             type="text"
                             placeholder="Name" />
                     </FormGroup>{' '}
                     <Button
                         onClick={() => {
-                            this.searchName(this.state.temp)
+                            this.searchName(this.state.patientName)
                         }}
                         type="submit"
                     >
@@ -109,22 +109,35 @@ class UpdatePatientHistory extends Component {
             ) :
             (
                 <React.Fragment>
-                    <h3> Enter patient name </h3>
+                    <h3> Enter patient information </h3>
                     <FormGroup controlId="formInLineName">
                         <ControlLabel>
                         </ControlLabel>{' '}
                         <FormControl
-                            onChange={event => this.setState({ temp: event.target.value })}
+                            onChange={event => this.setState({ patientDosage: event.target.value })}
                             type="text"
-                            placeholder="Name" />
+                            placeholder="Dosage" />
+                        <FormControl
+                            onChange={event => this.setState({ prescription: event.target.value })}
+                            type="text"
+                            placeholder="Prescription" />
+                        <FormControl
+                            onChange={event => this.setState({ lastPrescribedDate: event.target.value })}
+                            type="text"
+                            placeholder="Prescribed date" />
+                        <FormControl
+                            onChange={event => this.setState({ lastRefillDate: event.target.value })}
+                            type="text"
+                            placeholder="Date of last refill" />
+                        
                     </FormGroup>{' '}
                     <Button
                         onClick={() => {
-                            this.searchName(this.state.temp)
+                            this.updatePatientHistory(this.state)
                         }}
                         type="submit"
                     >
-                        Search Name
+                        Update Information
                 </Button>
                 </React.Fragment>
             );
