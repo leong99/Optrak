@@ -55,7 +55,7 @@ class UpdatePatientHistory extends Component {
         })
     }
 
-    updatePatientHistory()
+    updatePatientHistory(){}
 
     checkFields() {
         if (this.state.prescription !== '' && this.state.patientDosage === '') {
