@@ -40,6 +40,33 @@ class UpdatePatientHistory extends Component{
         
     }
 
+    checkFields(){
+        if(this.state.patientName === '') {
+            this.setState({error: {message: 'Please enter a patient name'}});
+            return false;
+        }
+        else {
+            if(this.state.prescription !== '' && this.state.patientDosage === '') {
+                this.setState({error: {message: 'Please enter a dosage for the prescribed opioid'}});
+                return false;
+
+            }
+            else if(this.state.prescription === '' && this.state.patientDosage !== '') {
+                this.setState({error: {message: 'Please enter an opioid for the given dosage'}});
+                return false;
+            }
+            else if(this.state.lastPrescribedDate === '') {
+                this.setState({error: {message: 'Please enter the last prescribed date'}});
+                return false;
+            }
+            else if(this.state.lastRefillDate === '') {
+                this.setState({error: {message: 'Please enter the last refill date'}});
+                return false;
+            }
+        }
+        return true;
+    }
+
     render(){
         console.log(this.state);
         const displayScreen= (!this.state.patientExists) ?
@@ -63,7 +90,10 @@ class UpdatePatientHistory extends Component{
                 Search Name
                 </Button>
                 </React.Fragment>
-                ):(null);
+                ):
+                (
+                null
+            );
 
         return(
             <div>
