@@ -24,16 +24,15 @@ class UpdatePatientHistory extends Component{
         };
     }
 
-    searchName(name){
+    searchName(name){ //checks that name exists and updates state if it does/doesn't
         contract.then(optrakContract =>{
             optrakContract.methods.getProviderMetaCount(name).call().then(
                 metaCount => { console.log(metaCount);
                     if (metaCount <= 2){
-                        this.setState({error: {message: 'The given patient\'s information does not exist. Please double check your spelling.'}});
-                        return false;
+                        this.setState({patientExists: false, patientName:'', error: {message: 'The given patient\'s information does not exist. Please double check your spelling.'}});
                     }
                     else{
-                        return true;
+                        this.setState({patientExists: true, patientName: name});
                     }
                 }
             )
@@ -56,10 +55,8 @@ class UpdatePatientHistory extends Component{
                 placeholder="Name" />
                 </FormGroup>{' '}
                 <Button
-                onClick={()=>{this.setState({patientName: this.state.temp});
-                this.searchName(this.state.patientName) ?
-                this.setState({patientExists: true}): 
-                this.setState({patientExists: false, patientName: ''}); 
+                onClick={()=>{
+                this.searchName(this.state.temp) 
                 }}
                 type="submit"
                 >
