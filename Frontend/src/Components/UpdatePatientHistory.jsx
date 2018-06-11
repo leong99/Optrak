@@ -12,17 +12,38 @@ class UpdatePatientHistory extends Component{
     constructor(props){
         super(props);
         this.state={
+            patientExists: false,
             patientName: '',
             temp: '',
             patientDosage: '',
             lastPrescribedDate: '',
-            lastRefillDate: ''
+            lastRefillDate: '',
+            error:{
+                message:''
+            }
         };
     }
 
+    searchName(name){
+        contract.then(optrakContract =>{
+            optrakContract.methods.getProviderMetaCount(name).call().then(
+                metaCount => { console.log(metaCount);
+                    if (metaCount <= 2){
+                        this.setState({error: {message: 'The given patient\'s information does not exist. Please double check your spelling.'}});
+                        return false;
+                    }
+                    else{
+                        return true;
+                    }
+                }
+            )
+        })
+        
+    }
+
     render(){
-        console.log(this.state.temp);
-        const displayScreen= (this.state.patientName==='') ?
+        console.log(this.state);
+        const displayScreen= (!this.state.patientExists) ?
                 (
                 <React.Fragment>
                 <h3> Enter patient name </h3>
@@ -35,7 +56,11 @@ class UpdatePatientHistory extends Component{
                 placeholder="Name" />
                 </FormGroup>{' '}
                 <Button
-                onClick={()=>{this.setState({patientName: this.state.temp})}}
+                onClick={()=>{this.setState({patientName: this.state.temp});
+                this.searchName(this.state.patientName) ?
+                this.setState({patientExists: true}): 
+                this.setState({patientExists: false, patientName: ''}); 
+                }}
                 type="submit"
                 >
                 Search Name
