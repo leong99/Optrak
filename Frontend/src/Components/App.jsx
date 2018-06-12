@@ -19,6 +19,7 @@ class App extends Component {
 
     signOut() {
         firebaseApp.auth().signOut();
+        //signs out the user and redirects
         this.props.history.push('/signin');
     }
 
