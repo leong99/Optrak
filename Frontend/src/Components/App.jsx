@@ -39,7 +39,7 @@ class App extends Component {
                     <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
                     <div>Update patient history</div>
                     <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
-                    <div>Grant access</div> 
+                    <div><button className="btn btn-success" onClick={() => this.props.history.push('./grantAccess')}> Grant access </button></div> 
                 <button className="btn btn-danger" onClick={() => this.signOut()}>
                 Sign Out
                 </button>
