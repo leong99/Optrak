@@ -6,6 +6,8 @@ import SignIn from './Components/SignIn';
 import SignUp from './Components/SignUp';
 import VerifyEmail from './Components/VerifyEmail';
 import AddPatientHistory from './Components/AddPatientHistory';
+import ViewPatientHistory from './Components/ViewPatientHistory';
+import GrantAccess from './Components/GrantAccess';
 import {BrowserRouter, Route, browserHistory, withRouter} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
@@ -42,6 +44,8 @@ ReactDOM.render(
                 <Route path="/signup" component={SignUp}/>
                 <Route path="/verifyemail" component={VerifyEmail}/>
                 <Route path ="/addPatientHist" component={AddPatientHistory}/>
+                <Route path ="/viewPatientHist" component={ViewPatientHistory}/>
+                <Route path ="/grantAccess" component={GrantAccess}/>
 
             </div>
         </BrowserRouter>

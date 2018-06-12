@@ -23,7 +23,7 @@ class GrantAccess extends Component {
             error: {
                 message: ''
             }
-            
+
         }
         firebaseApp.auth().onAuthStateChanged(user => {
             if (user) {
@@ -32,6 +32,9 @@ class GrantAccess extends Component {
         })
     }
 
+    //If you're reading through this function, I apologize. Until I figure out how to fire the transactions as an atomic unit then 
+    //This is the only way to ensure that every single transaction successfully fires, and that the others aren't triggered unless all 
+    //prior transactions have been successful.
     grantAccess(e) {
         e.preventDefault();
         if (this.checkFields()) {
@@ -48,7 +51,7 @@ class GrantAccess extends Component {
                                         console.log('Access granted to prescription metadata');
                                         optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Dosage', this.state.userName).call()
                                             .then(access => {
-                                                
+
                                                 if (access) {
                                                     console.log('checkpoint');
                                                     optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Dosage', this.state.accesssor, true).send()
@@ -63,9 +66,9 @@ class GrantAccess extends Component {
                                                                                 optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Last Prescribed Date', this.state.userName).call()
                                                                                     .then(access => {
                                                                                         optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Last Prescribed Date', this.state.accesssor, true
-                                                                                            ).send().on('receipt', receipt => {
-                                                                                                console.log('Access granted');
-                                                                                            }).catch(error => this.setState({ error: { message: 'Final transaction failed' } }));
+                                                                                        ).send().on('receipt', receipt => {
+                                                                                            console.log('Access granted');
+                                                                                        }).catch(error => this.setState({ error: { message: 'Final transaction failed' } }));
                                                                                     })
                                                                             }).catch(error => this.setState({ error: { message: 'Transaction failed' } }))
                                                                     }
@@ -80,55 +83,55 @@ class GrantAccess extends Component {
             }
         }
     }
-isPatient() {
-    contract.then(optrakContract => {
-        optrakContract.methods.getProviderMetaCount(this.state.patientName).call().then(metaCount => {
-            if (metaCount < 2) {
-                //A patient has to have at least 2 pieces of metadata in order to actually exist e.g Prescription and Dosage
-                this.setState({ error: { message: 'The given patient\'s information does not exist. Please double check your spelling.' } });
-                this.setState({ clicked: false });
+    isPatient() {
+        contract.then(optrakContract => {
+            optrakContract.methods.getProviderMetaCount(this.state.patientName).call().then(metaCount => {
+                if (metaCount < 2) {
+                    //A patient has to have at least 2 pieces of metadata in order to actually exist e.g Prescription and Dosage
+                    this.setState({ error: { message: 'The given patient\'s information does not exist. Please double check your spelling.' } });
+                    this.setState({ clicked: false });
+                }
+            })
+        })
+
+        return !(this.state.error.message === 'The given patient\'s information does not exist. Please double check your spelling.')
+    }
+
+    checkFields() {
+        if (this.state.patientName === '') {
+            this.setState({ error: { message: 'Please enter a patient name' } });
+            return false;
+        }
+        else if (this.state.accessor === '') {
+            this.setState({ error: { message: 'Please enter an accessor name' } })
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    render() {
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if (!user) {
+                this.props.history.push('./signin');
             }
         })
-    })
-
-    return !(this.state.error.message === 'The given patient\'s information does not exist. Please double check your spelling.')
-}
-
-checkFields() {
-    if (this.state.patientName === '') {
-        this.setState({ error: { message: 'Please enter a patient name' } });
-        return false;
+        return (
+            <div>
+                <h3>Grant patient access to another provider</h3>
+                <form inline="true">
+                    <input type="text" placeholder="Enter desired accessor" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ accesssor: event.target.value.trim() })} />
+                    <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ patientName: event.target.value.trim() })} />
+                    <button className="btn btn-success" onClick={e => this.grantAccess(e)}> Submit </button>
+                </form>
+                <div>{this.state.error.message}</div>
+                <div><Link to='./app'> Go back to main app </Link></div>
+            </div>
+        )
     }
-    else if (this.state.accessor === '') {
-        this.setState({ error: { message: 'Please enter an accessor name' } })
-        return false;
-    }
-    else {
-        return true;
-    }
-}
-
-render() {
-    firebaseApp.auth().onAuthStateChanged(user => {
-        if (!user) {
-            this.props.history.push('./signin');
-        }
-    })
-    return (
-        <div>
-            <h3>Grant patient access to another provider</h3>
-            <form inline="true">
-                <input type="text" placeholder="Enter desired accessor" className="form-control" style={{ marginRight: '5px' }}
-                    onChange={event => this.setState({ accesssor: event.target.value.trim() })} />
-                <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
-                    onChange={event => this.setState({ patientName: event.target.value.trim() })} />
-                <button className="btn btn-success" onClick={e => this.grantAccess(e)}> Submit </button>
-            </form>
-            <div>{this.state.error.message}</div>
-            <div><Link to='./app'> Go back to main app </Link></div>
-        </div>
-    )
-}
 }
 
 export default GrantAccess;
