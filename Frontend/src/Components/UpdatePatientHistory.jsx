@@ -42,9 +42,10 @@ class UpdatePatientHistory extends Component {
 
     }
 
-    checkPatientAccess(name){ //checks to see if user has permission to update history
+    checkPatientAccess(){ //checks to see if user has permission to update history
         this.setState({userName: firebaseApp.auth().currentUser});
         contract.then(optrakContract =>{
+            //assuming that having access to the prescription means there is access to all fields
             optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName).call().then(
                 () => {return true}, //promise fulfilled
                 () => { //promise rejected
@@ -55,7 +56,33 @@ class UpdatePatientHistory extends Component {
         })
     }
 
-    updatePatientHistory(){}
+    updatePatientHistory(){
+        if(this.checkFields()){
+            contract.then(optrakContract=>{
+                optrakContract.methods.addMetaData(this.state.patientName, 'Prescription', this.state.prescription, true).send()
+                .on('receipt', this.successUpdate('Prescription'))
+                .catch(this.failUpdate('Prescription'));
+                optrakContract.methods.addMetaData(this.state.patientName, 'Dosage', this.state.patientDosage, true).send()
+                .on('receipt', this.successUpdate('Dosage'))
+                .catch(this.failUpdate('Dosage'));
+                optrakContract.methods.addMetaData(this.state.patientName, 'Last Prescribed Date', this.state.lastPrescribedDate, true).send()
+                .on('receipt', this.successUpdate('Last Prescribed Date'))
+                .catch(this.failUpdate('Last Prescribed Date'));
+                optrakContract.methods.addMetaData(this.state.patientName, 'Last Refill Date', this.state.lastRefillDate, true).send()
+                .on('receipt', this.successUpdate('Last Refill Date'))
+                .catch(this.failUpdate('Last Refill Date'));
+
+            }
+        }
+    }
+
+    successUpdate(param){
+        console.log(`${param} metadata update was successful`);
+    }
+
+    failUpdate(param){
+        this.setState({error: {message: `${param} transaction failed, please refresh and try again.`}});
+    }
 
     checkFields() {
         if (this.state.prescription !== '' && this.state.patientDosage === '') {
@@ -129,11 +156,16 @@ class UpdatePatientHistory extends Component {
                             onChange={event => this.setState({ lastRefillDate: event.target.value })}
                             type="text"
                             placeholder="Date of last refill" />
-                        
+
                     </FormGroup>{' '}
                     <Button
                         onClick={() => {
-                            this.updatePatientHistory(this.state)
+                            if (this.checkPatientAccess()){
+                                this.updatePatientHistory(this.state);
+                            }
+                            else{
+                                //maybe prompt user to enter in a new name?
+                            }
                         }}
                         type="submit"
                     >
