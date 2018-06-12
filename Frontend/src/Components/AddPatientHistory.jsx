@@ -35,11 +35,20 @@ class AddPatientHistory extends Component {
     //Current program assumes 1 opioid prescription to a patient
     addPatientInfo = async() => {
         
+        //verifies that there are no errors in the inputs of this form
         if(this.checkFields()) {
             this.setState({error: {message: 'This will take a minute or two, please be patient'}})
+            //Should implement some kind of loading thing here
             contract.then(optrakContract => {
+                //contract returns instance of our smart contract as its promise value, makigng us use a .then()
                 optrakContract.methods.addMetaData(this.state.patientName, 'Prescription', this.state.prescription, this.state.overwrite).send().on('receipt', receipt => {
+                   //Creates a transaction on the client side in order to add a certain piece of metadata to a patient
                     console.log('Prescription metadata successfully added');
+                    //Updates the current provider's metadata access, allowing them to fully see/control a patient's information 
+                    //which they have added
+
+                    //This and all further transactions created fire upon the receipt of the previous transaction being received
+                    //To improve upon this we can find out how to implement these transactions as an atomic unit
                     optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName, true).send().on('receipt',receipt => {
                         console.log('Access to this patient\'s prescription metadata granted');
                         optrakContract.methods.addMetaData(this.state.patientName, 'Dosage', this.state.patientDosage, this.state.overwrite).send().on('receipt', receipt => {
@@ -77,6 +86,9 @@ class AddPatientHistory extends Component {
         }
     }
 
+    /**
+     * Checks to see that all fields that are necessary are properly filled out
+     */
     checkFields() {
         
         if(this.state.patientName == '') {
@@ -110,6 +122,7 @@ class AddPatientHistory extends Component {
         firebaseApp.auth().onAuthStateChanged(user => {
             if(!user) {
                 this.props.history.push('./signin');
+                //makes sure that the current user is signed in befor being able to access this page
             }
             else {
                 console.log(this.state.userName)
