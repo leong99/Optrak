@@ -138,7 +138,7 @@ class SignUp extends Component {
     render() {
         return (
             <form inline="true">
-                <h2>Register for OpTrak</h2>
+                <h3>Register for OpTrak</h3>
                 <div className="form-group">
                     <DropdownButton
                         bsStyle={'primary'}
