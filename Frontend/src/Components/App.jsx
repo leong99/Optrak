@@ -19,8 +19,11 @@ class App extends Component {
 
     signOut() {
         firebaseApp.auth().signOut();
+        //signs out the user and redirects
         this.props.history.push('/signin');
     }
+
+    
 
     render() {
         console.log(firebaseApp.auth().currentUser);
@@ -33,10 +36,10 @@ class App extends Component {
             
             return(<div> 
                     <h3>Welcome back!</h3>
-                    <div>Add patient history</div>
+                    <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
                     <div>Update patient history</div>
-                    <div>View patient history</div>
-                    <div>Grant access</div> 
+                    <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
+                    <div><button className="btn btn-success" onClick={() => this.props.history.push('./grantAccess')}> Grant access </button></div> 
                 <button className="btn btn-danger" onClick={() => this.signOut()}>
                 Sign Out
                 </button>

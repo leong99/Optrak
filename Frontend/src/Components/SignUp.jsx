@@ -7,6 +7,9 @@ import { DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, B
 import Web3 from 'web3';
 
 const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+
+//creates our smart contract instance using the current user's address from metamask or Mist browser or whatever they're using
+//contract address is used in this instantiation, will have to change whenever the contract is deployed to somewhere else
 const contract = web3.eth.getAccounts().then(e => {
     const optrakContract = new web3.eth.Contract([{ "constant": true, "inputs": [{ "name": "sharer", "type": "string" }, { "name": "metaName", "type": "string" }, { "name": "sharee", "type": "string" }], "name": "getMetaDataAccess", "outputs": [{ "name": "", "type": "bool" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "renounceOwnership", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [{ "name": "provider", "type": "string" }, { "name": "index", "type": "uint256" }], "name": "getMetaName", "outputs": [{ "name": "", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "provider", "type": "string" }, { "name": "metaName", "type": "string" }], "name": "getMetaData", "outputs": [{ "name": "", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "name": "provider", "type": "string" }, { "name": "pubkey", "type": "string" }, { "name": "provStatus", "type": "bool" }], "name": "addProvider", "outputs": [{ "name": "", "type": "bool" }], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [{ "name": "", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "name": "provider", "type": "string" }, { "name": "metaName", "type": "string" }, { "name": "content", "type": "string" }, { "name": "overwrite", "type": "bool" }], "name": "addMetaData", "outputs": [{ "name": "", "type": "bool" }], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [{ "name": "provider", "type": "string" }], "name": "getProviderPubkey", "outputs": [{ "name": "", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "provider", "type": "string" }], "name": "getProviderMetaCount", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "name": "sharer", "type": "string" }, { "name": "metaName", "type": "string" }, { "name": "sharee", "type": "string" }, { "name": "access", "type": "bool" }], "name": "updateMetaDataAccess", "outputs": [{ "name": "", "type": "bool" }], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "previousOwner", "type": "address" }], "name": "OwnershipRenounced", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "name": "previousOwner", "type": "address" }, { "indexed": true, "name": "newOwner", "type": "address" }], "name": "OwnershipTransferred", "type": "event" }], "0xd41e5da3c25047256fe8603b745f82d891ffaab6", {
         from: e[0],
@@ -21,10 +24,6 @@ const contract = web3.eth.getAccounts().then(e => {
 
 
 
-const options = [
-    'Provider', 'Patient'
-];
-const defaultOption = options[0];
 
 
 class SignUp extends Component {
@@ -47,6 +46,7 @@ class SignUp extends Component {
     }
 
     checkFields() {
+        //Checks different fields of the signup form to verify they have all been entered correctly
         if (this.state.email.length == 0) {
             this.setState({ error: { message: 'Please enter your email' } });
             return false;
@@ -71,21 +71,28 @@ class SignUp extends Component {
 
     addProvider = async () => {
         if(this.checkFields()) {
+            //verifies that necessary fields are filled out
             contract.then(optrakContract => {
                 this.setState({pubkey: optrakContract.options.from});
+                //the .from address is the current user, thus we log their public key during account creation
                 const {email, password} = this.state;
+                //current email and password are assumed to be correct at this point due to previous checks in checkFields()
                 firebaseApp.auth().createUserWithEmailAndPassword(email, password).then(() => {
+                    //firebase is used to create a new user with an email and password, making for very easy authentication
                     console.log(this.state.pubkey);
                     optrakContract.methods.addProvider(this.state.name, this.state.pubkey, this.state.provStatus).send().on('receipt', async(receipt) => {
+                        //optrak instance is called upon here to add the current provider
+                        //upon the transaction finishing and receiving a receipt, the following commands fire
                         console.log(receipt);
-                        optrakUserRef.push(this.state);
+                        optrakUserRef.push(this.state); //pushes the current user to optrak user database (might not be necessary)
                         firebaseApp.auth().onAuthStateChanged(user => {
                             if(user) {
                                 user.sendEmailVerification();
                                 user.updateProfile({displayName: this.state.name});
+                                //Sends email verification necessary for login and sets the user's displayName to the entered name
                             }
                         })
-                        firebaseApp.auth().signOut();
+                        firebaseApp.auth().signOut(); //signs out the user before redirecting them
                         this.props.history.push('./signin');
                     }).catch(error => {
                         if(error) {
@@ -95,6 +102,8 @@ class SignUp extends Component {
                             if(user) {
                                 user.delete().then(firebaseApp.auth().signOut());
                                 window.location.reload();
+                                //if the transaction failed then the created user will be deleted and signed out and the page will be 
+                                //refreshed, allowing the user to try again
                             }
                             else {
                                 return null;
@@ -138,7 +147,7 @@ class SignUp extends Component {
     render() {
         return (
             <form inline="true">
-                <h2>Register for OpTrak</h2>
+                <h3>Register for OpTrak</h3>
                 <div className="form-group">
                     <DropdownButton
                         bsStyle={'primary'}

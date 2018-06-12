@@ -18,9 +18,11 @@ class SignIn extends Component {
         const {email, password}=this.state;
         firebaseApp.auth().signInWithEmailAndPassword(email, password).then(user => {
             if(user.emailVerified) {
+                //makes sure that user's email is verified and allows them to go to the app upon verification
                 this.props.history.push('./app');
             }
             else {
+                //redirects user to email verification page if email is not already verified
                 this.props.history.push('./verifyemail');
             }
             
