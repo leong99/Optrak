@@ -72,9 +72,10 @@ class UpdatePatientHistory extends Component {
                 .on('receipt', this.successUpdate('Last Refill Date'))
                 .catch(this.failUpdate('Last Refill Date'));
 
-            }
+            })
         }
     }
+    
 
     successUpdate(param){
         console.log(`${param} metadata update was successful`);
