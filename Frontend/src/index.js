@@ -44,7 +44,7 @@ ReactDOM.render(
                 <Route path="/signin" component={SignIn}/>
                 <Route path="/signup" component={SignUp}/>
                 <Route path="/verifyemail" component={VerifyEmail}/>
-                <Route path="/updatepatienthistory" component={UpdatePatientHistory}/>
+                <Route path="/updatePatientHist" component={UpdatePatientHistory}/>
                 <Route path ="/addPatientHist" component={AddPatientHistory}/>
                 <Route path ="/viewPatientHist" component={ViewPatientHistory}/>
                 <Route path ="/grantAccess" component={GrantAccess}/>

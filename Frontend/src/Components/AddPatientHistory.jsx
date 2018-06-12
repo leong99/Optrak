@@ -146,7 +146,7 @@ class AddPatientHistory extends Component {
                     <input type='text' placeholder="Enter Last Refill Date (DD/MM/YYYY)" className="form-control" syle={{marginRight: '5px'}}
                     onChange={event => this.setState({lastRefillDate: event.target.value})}/>
                     
-                    <button className="btn btn-success" type="button" onClick={this.addPatientInfo()}>
+                    <button className="btn btn-success" type="button" onClick={() =>{this.addPatientInfo()}}>
                     Submit
                     </button>
                     

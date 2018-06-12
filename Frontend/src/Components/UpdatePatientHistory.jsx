@@ -43,14 +43,21 @@ class UpdatePatientHistory extends Component {
     }
 
     checkPatientAccess(){ //checks to see if user has permission to update history
-        this.setState({userName: firebaseApp.auth().currentUser});
+        this.setState({userName: firebaseApp.auth().currentUser.displayName});
+        console.log('test 1');
         contract.then(optrakContract =>{
             //assuming that having access to the prescription means there is access to all fields
-            optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName).call().then(
-                () => {return true}, //promise fulfilled
-                () => { //promise rejected
-                    this.setState({ error: {message: `The current user ${this.state.userName} does not have permission to update ${this.state.patientName}\'s records.`}});
-                    return false;
+            optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName).call().
+            then(access => 
+                {
+                    if (access){
+                        console.log('made it here');
+                        return true; //has access
+                    }
+                    else{
+                        this.setState({ error: {message: `The current user ${this.state.userName} does not have permission to update ${this.state.patientName}\'s records.`}});
+                        return false;
+                    }
                 }
             )
         })
@@ -73,7 +80,7 @@ class UpdatePatientHistory extends Component {
                 .catch(this.failUpdate('Last Refill Date'));
 
             })
-        }
+        }   
     }
     
 
