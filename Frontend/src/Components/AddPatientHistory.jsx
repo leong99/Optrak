@@ -23,12 +23,18 @@ class AddPatientHistory extends Component {
             },
             overwrite: true
         };
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if(user) {
+                this.setState({userName: user.displayName});
+            }
+        })
     }
 
     //Calls smart contract and adds different metadata to it. This is likely not the data that we are going to be using
     //But this can be modified easily to fit any data that need be stored on the blockchain
     //Current program assumes 1 opioid prescription to a patient
     addPatientInfo = async() => {
+        
         if(this.checkFields()) {
             this.setState({error: {message: 'This will take a minute or two, please be patient'}})
             contract.then(optrakContract => {
@@ -72,6 +78,7 @@ class AddPatientHistory extends Component {
     }
 
     checkFields() {
+        
         if(this.state.patientName == '') {
             this.setState({error: {message: 'Please enter a patient name'}});
             return false;
@@ -99,9 +106,13 @@ class AddPatientHistory extends Component {
     }
 
     render() {
+        console.log(this.state);
         firebaseApp.auth().onAuthStateChanged(user => {
             if(!user) {
                 this.props.history.push('./signin');
+            }
+            else {
+                console.log(this.state.userName)
             }
             
         })
