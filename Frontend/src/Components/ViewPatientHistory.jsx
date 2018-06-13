@@ -50,15 +50,26 @@ class ViewPatientHistory extends Component {
             clicked: false,
             error: {
                 message: ''
-            }
+            },
+            isMounted: false
         }
+
+
+    }
+
+    componentDidMount() {
         //best way to get the current user's name and save it
+        this.setState({ isMounted: true });
+        if (this.state.isMounted) {
         firebaseApp.auth().onAuthStateChanged(user => {
-            if (user) {
-                this.setState({ userName: user.displayName });
-            }
+           
+                if (user) {
+                    this.setState({ userName: user.displayName });
+                }
+
         })
     }
+}
 
     isPatient() {
         contract.then(optrakContract => {
@@ -66,7 +77,7 @@ class ViewPatientHistory extends Component {
                 if (metaCount < 2) {
                     //A patient has to have at least 2 pieces of metadata in order to actually exist e.g Prescription and Dosage
                     this.setState({ error: { message: 'The given patient\'s information does not exist. Please double check your spelling.' } });
-                    this.setState({clicked: false});
+                    this.setState({ clicked: false });
                 }
             })
         })
@@ -78,7 +89,7 @@ class ViewPatientHistory extends Component {
     onClick(e) {
         e.preventDefault(); //stops the button from immediately submitting a form upon click
         if (this.isPatient()) {
-            this.setState({sentName: this.state.patientName});
+            this.setState({ sentName: this.state.patientName });
             //The name that was in the search box as the button was clicked
             console.log(this.state.sentName);
 
@@ -97,7 +108,7 @@ class ViewPatientHistory extends Component {
                     }
                     else {
                         this.setState({ error: { message: "You do not have access to this patient\'s prescription details" } });
-                        this.setState({clicked: false});
+                        this.setState({ clicked: false });
                         //Sets 'clicked' to false in order to prevent a PatientForm from being shown
                     }
                 })
@@ -129,8 +140,8 @@ class ViewPatientHistory extends Component {
                 })
 
             })
-            this.setState({clicked: true}); //sets 'clicked' to true in order to be able to use the PatientForm
-            
+            this.setState({ clicked: true }); //sets 'clicked' to true in order to be able to use the PatientForm
+
         }
 
     }
@@ -145,12 +156,12 @@ class ViewPatientHistory extends Component {
             <div>
                 <form inline="true">
                     <div>
-                        <input type="text" placeholder="Patient Name" className="form-control" onChange={event => this.setState({ patientName: event.target.value.trim() } )}
+                        <input type="text" placeholder="Patient Name" className="form-control" onChange={event => this.setState({ patientName: event.target.value.trim() })}
                             minLength='2' />
                         <button className="btn btn-primary" onClick={(e) => this.onClick(e)}> Search for Patient </button>
                         <div>
-                        <PatientForm  clicked={this.state.clicked} prescribedOpioid={this.state.prescribedOpioid} patientName={this.state.sentName} patientDosage={this.state.patientDosage} lastPrescribedDate={this.state.lastPrescribedDate}
-                        lastRefillDate={this.state.lastRefillDate}/>
+                            <PatientForm clicked={this.state.clicked} prescribedOpioid={this.state.prescribedOpioid} patientName={this.state.sentName} patientDosage={this.state.patientDosage} lastPrescribedDate={this.state.lastPrescribedDate}
+                                lastRefillDate={this.state.lastRefillDate} />
                         </div>
                     </div>
                 </form>

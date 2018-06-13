@@ -23,11 +23,7 @@ class AddPatientHistory extends Component {
             },
             overwrite: true
         };
-        firebaseApp.auth().onAuthStateChanged(user => {
-            if(user) {
-                this.setState({userName: user.displayName});
-            }
-        })
+        
     }
 
     //Calls smart contract and adds different metadata to it. This is likely not the data that we are going to be using
@@ -90,6 +86,11 @@ class AddPatientHistory extends Component {
      * Checks to see that all fields that are necessary are properly filled out
      */
     checkFields() {
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if(user) {
+                this.setState({userName: user.displayName});
+            }
+        })
         
         if(this.state.patientName == '') {
             this.setState({error: {message: 'Please enter a patient name'}});

@@ -25,11 +25,7 @@ class GrantAccess extends Component {
             }
 
         }
-        firebaseApp.auth().onAuthStateChanged(user => {
-            if (user) {
-                this.setState({ userName: user.displayName });
-            }
-        })
+       
     }
 
     //If you're reading through this function, I apologize. Until I figure out how to fire the transactions as an atomic unit then 
@@ -98,6 +94,11 @@ class GrantAccess extends Component {
     }
 
     checkFields() {
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if (user) {
+                this.setState({ userName: user.displayName });
+            }
+        })
         if (this.state.patientName === '') {
             this.setState({ error: { message: 'Please enter a patient name' } });
             return false;
