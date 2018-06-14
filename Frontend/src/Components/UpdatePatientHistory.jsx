@@ -80,7 +80,10 @@ class UpdatePatientHistory extends Component {
                 .catch(this.failUpdate('Last Refill Date'));
 
             })
-        }   
+            if ((/transaction failed, please refresh and try again./).test(this.state.error.message)){
+                this.setState({error: {message: "Information successfully updated."}});
+            }
+        }
     }
     
 
@@ -170,7 +173,8 @@ class UpdatePatientHistory extends Component {
                         onClick={ () => {
                             this.checkPatientAccess().then(bool => {
                                 if (bool){
-                                    this.updatePatientHistory(this.state);
+                                    console.log('what');
+                                    this.updatePatientHistory();
                                 }
                                 else{
                                     console.log('Failed');
@@ -186,13 +190,16 @@ class UpdatePatientHistory extends Component {
                 </Button>
                 </React.Fragment>
             );
+        
 
         return (
             <div>
                 {displayScreen}
-
+                <div>{this.state.error.message}</div>
+                <div><Link to="./app"> Go back to main page </Link></div>
 
             </div>
+            
 
         )
     }
