@@ -9,7 +9,7 @@ function PatientForm(props) {
     return (
         <div>
             <h3>Welcome back!</h3>
-            <div><button className="btn btn-warning" onClick={() => props.history.push('./viewPatientHist')}>View patient history</button></div>
+            <div><button className="btn btn-warning" onClick={() => props.history.push('./viewPatientHist')}>View your history</button></div>
             <div><button className="btn btn-success" onClick={() => props.history.push('./grantAccess')}> Grant/revoke access </button></div>
             <button className="btn btn-danger" onClick={props.onClick}>
                 Sign Out
