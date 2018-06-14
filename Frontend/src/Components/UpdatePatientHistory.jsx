@@ -44,14 +44,13 @@ class UpdatePatientHistory extends Component {
 
     checkPatientAccess(){ //checks to see if user has permission to update history
         this.setState({userName: firebaseApp.auth().currentUser.displayName});
-        console.log('test 1');
-        contract.then(optrakContract =>{
+        return contract.then(optrakContract =>{
             //assuming that having access to the prescription means there is access to all fields
-            optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName).call().
+            return optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName).call().
             then(access => 
                 {
                     if (access){
-                        console.log('made it here');
+                        console.log('Success');
                         return true; //has access
                     }
                     else{
@@ -61,6 +60,7 @@ class UpdatePatientHistory extends Component {
                 }
             )
         })
+        
     }
 
     updatePatientHistory(){
@@ -167,14 +167,19 @@ class UpdatePatientHistory extends Component {
 
                     </FormGroup>{' '}
                     <Button
-                        onClick={() => {
-                            if (this.checkPatientAccess()){
-                                this.updatePatientHistory(this.state);
+                        onClick={ () => {
+                            this.checkPatientAccess().then(bool => {
+                                if (bool){
+                                    this.updatePatientHistory(this.state);
+                                }
+                                else{
+                                    console.log('Failed');
+                                    //maybe prompt user to enter in a new name?
+                                }
                             }
-                            else{
-                                //maybe prompt user to enter in a new name?
-                            }
-                        }}
+                        )
+                        }
+                    }
                         type="submit"
                     >
                         Update Information
