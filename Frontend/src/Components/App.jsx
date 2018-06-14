@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { web3 } from '../Components/SignUp'
+import { web3 } from '../Components/SignUp' //should this be imported from here?
 import { firebaseApp } from '../firebase'
 import { Link, BrowserRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -37,7 +37,7 @@ class App extends Component {
             return(<div> 
                     <h3>Welcome back!</h3>
                     <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
-                    <div><button className="btn btn-info" onclick={() => this.props.history.push('./updatePatientHist')}> Update patient history</button></div>
+                    <div><button className="btn btn-default" onclick={() => this.props.history.push('./updatePatientHist')}> Update patient history</button></div>
                     <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
                     <div><button className="btn btn-success" onClick={() => this.props.history.push('./grantAccess')}> Grant access </button></div> 
                 <button className="btn btn-danger" onClick={() => this.signOut()}>

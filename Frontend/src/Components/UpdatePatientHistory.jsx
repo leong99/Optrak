@@ -64,6 +64,8 @@ class UpdatePatientHistory extends Component {
     }
 
     updatePatientHistory(){
+        console.log('got to the actual method');
+        console.log(this.checkFields());
         if(this.checkFields()){
             contract.then(optrakContract=>{
                 optrakContract.methods.addMetaData(this.state.patientName, 'Prescription', this.state.prescription, true).send()
@@ -113,6 +115,7 @@ class UpdatePatientHistory extends Component {
             this.setState({ error: { message: 'Please enter the last refill date' } });
             return false;
         }
+        console.log("got here");
         return true;
     }
 
