@@ -140,7 +140,8 @@ class UpdatePatientHistory extends Component {
                     </FormGroup>{' '}
                     <Button
                         onClick={() => {
-                            this.searchName(this.state.patientName)
+                            this.searchName(this.state.patientName);
+                            document.getElementById("formInLineName").value="";
                         }}
                         type="submit"
                     >
