@@ -141,7 +141,7 @@ class UpdatePatientHistory extends Component {
                     <Button
                         onClick={() => {
                             this.searchName(this.state.patientName);
-                            document.getElementById("formInLineName").value="";
+                            document.getElementById("formInLineName").value=""; //bad fix but clears out the form name
                         }}
                         type="submit"
                     >
