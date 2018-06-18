@@ -50,23 +50,36 @@ class ViewPatientHistory extends Component {
             clicked: false,
             error: {
                 message: ''
-            }
+            },
+            isMounted: false,
+            status: false
         }
+
+
+    }
+
+    componentDidMount() {
         //best way to get the current user's name and save it
-        firebaseApp.auth().onAuthStateChanged(user => {
-            if (user) {
-                this.setState({ userName: user.displayName });
-            }
-        })
+            firebaseApp.auth().onAuthStateChanged(async user => {
+                if (user) {
+                   await this.setState({ userName: user.displayName });
+                    contract.then(optrakContract => {
+                        optrakContract.methods.getProviderInfo(this.state.userName, optrakContract.options.from).call().then(provStatus => {
+                            this.setState({ status: provStatus });
+                        })
+                    })
+                }
+
+            })
     }
 
     isPatient() {
         contract.then(optrakContract => {
-            optrakContract.methods.getProviderMetaCount(this.state.patientName).call().then(metaCount => {
+            optrakContract.methods.getProviderMetaCount(this.state.sentName).call().then(metaCount => {
                 if (metaCount < 2) {
                     //A patient has to have at least 2 pieces of metadata in order to actually exist e.g Prescription and Dosage
                     this.setState({ error: { message: 'The given patient\'s information does not exist. Please double check your spelling.' } });
-                    this.setState({clicked: false});
+                    this.setState({ clicked: false });
                 }
             })
         })
@@ -77,8 +90,8 @@ class ViewPatientHistory extends Component {
 
     onClick(e) {
         e.preventDefault(); //stops the button from immediately submitting a form upon click
-        if (this.isPatient()) {
-            this.setState({sentName: this.state.patientName});
+        if (this.isPatient() && this.state.status) {
+            this.setState({ sentName: this.state.patientName });
             //The name that was in the search box as the button was clicked
             console.log(this.state.sentName);
 
@@ -97,7 +110,7 @@ class ViewPatientHistory extends Component {
                     }
                     else {
                         this.setState({ error: { message: "You do not have access to this patient\'s prescription details" } });
-                        this.setState({clicked: false});
+                        this.setState({ clicked: false });
                         //Sets 'clicked' to false in order to prevent a PatientForm from being shown
                     }
                 })
@@ -129,8 +142,26 @@ class ViewPatientHistory extends Component {
                 })
 
             })
-            this.setState({clicked: true}); //sets 'clicked' to true in order to be able to use the PatientForm
-            
+            this.setState({ clicked: true }); //sets 'clicked' to true in order to be able to use the PatientForm
+
+        }
+        else if(this.isPatient() && !this.state.status) {
+            this.setState({sentName: this.state.userName});
+            contract.then(optrakContract => {
+                optrakContract.methods.getMetaData(this.state.sentName, 'Prescription').call().then(data => {
+                    this.setState({prescribedOpioid: data});
+                })
+                optrakContract.methods.getMetaData(this.state.sentName, 'Dosage').call().then(data => {
+                    this.setState({patientDosage: data});
+                })
+                optrakContract.methods.getMetaData(this.state.sentName, 'Last Prescribed Date').call().then(data => {
+                    this.setState({lastPrescribedDate: data});
+                })
+                optrakContract.methods.getMetaData(this.state.sentName, 'Last Refill Date').call().then(data => {
+                    this.setState({lastRefillDate: data});
+                })
+            })
+            this.setState({clicked: true});
         }
 
     }
@@ -141,19 +172,29 @@ class ViewPatientHistory extends Component {
                 this.props.history.push('./signin');
             }
         })
+        console.log(this.state);
         return (
+        this.state.status ? (
             <div>
                 <form inline="true">
                     <div>
-                        <input type="text" placeholder="Patient Name" className="form-control" onChange={event => this.setState({ patientName: event.target.value.trim() } )}
+                        <input type="text" placeholder="Patient Name" className="form-control" onChange={event => this.setState({ patientName: event.target.value.trim() })}
                             minLength='2' />
                         <button className="btn btn-primary" onClick={(e) => this.onClick(e)}> Search for Patient </button>
                         <div>
-                        <PatientForm  clicked={this.state.clicked} prescribedOpioid={this.state.prescribedOpioid} patientName={this.state.sentName} patientDosage={this.state.patientDosage} lastPrescribedDate={this.state.lastPrescribedDate}
-                        lastRefillDate={this.state.lastRefillDate}/>
+                            <PatientForm clicked={this.state.clicked} prescribedOpioid={this.state.prescribedOpioid} patientName={this.state.sentName} patientDosage={this.state.patientDosage} lastPrescribedDate={this.state.lastPrescribedDate}
+                                lastRefillDate={this.state.lastRefillDate} />
                         </div>
                     </div>
                 </form>
+                <div>{this.state.error.message}</div>
+                <div><Link to="./app"> Back to main app </Link></div>
+            </div>) : <div>
+                <div>
+                    <button className="btn btn-primary" onClick={e => this.onClick(e)}> Display History </button>
+                <PatientForm clicked={this.state.clicked} prescribedOpioid={this.state.prescribedOpioid} patientName={this.state.sentName} patientDosage={this.state.patientDosage} lastPrescribedDate={this.state.lastPrescribedDate}
+                                lastRefillDate={this.state.lastRefillDate} isPatient={true}/>
+                </div>
                 <div>{this.state.error.message}</div>
                 <div><Link to="./app"> Back to main app </Link></div>
             </div>

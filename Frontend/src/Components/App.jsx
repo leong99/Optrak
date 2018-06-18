@@ -5,16 +5,44 @@ import { Link, BrowserRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { contract } from './SignUp';
 
-
+function PatientForm(props) {
+    return (
+        <div>
+            <h3>Welcome back!</h3>
+            <div><button className="btn btn-warning" onClick={() => props.history.push('./viewPatientHist')}>View your history</button></div>
+            <div><button className="btn btn-success" onClick={() => props.history.push('./grantAccess')}> Grant/revoke access </button></div>
+            <button className="btn btn-danger" onClick={props.onClick}>
+                Sign Out
+                </button>
+        </div>
+    )
+}
 
 class App extends Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
             query: '',
-            status: ''
+            status: false,
+            userName: ''
         }
+
+
+    }
+
+    componentDidMount() {
+        firebaseApp.auth().onAuthStateChanged(async user => {
+            if (user) {
+                await this.setState({ userName: user.displayName });
+                contract.then(optrakContract => {
+                    optrakContract.methods.getProviderInfo(this.state.userName, optrakContract.options.from).call().then(provStatus => {
+                        this.setState({ status: provStatus });
+                    })
+                })
+            }
+        })
+
     }
 
     signOut() {
@@ -23,30 +51,36 @@ class App extends Component {
         this.props.history.push('/signin');
     }
 
-    
+
 
     render() {
-        console.log(firebaseApp.auth().currentUser);
+        //console.log(firebaseApp.auth().currentUser);
         const user = firebaseApp.auth().onAuthStateChanged(user => {
-           if(!user) {
-               return this.props.history.push('/signin');
-           }
+            if (!user) {
+                return this.props.history.push('/signin');
+            }
+            console.log(this.state);
         });
-        console.log(user);
-            
-            return(<div> 
-                    <h3>Welcome back!</h3>
-                    <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
-                    <div><button className="btn btn-primary" onClick={() => this.props.history.push('./updatePatientHist')}> Update patient history</button></div>
-                    <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
-                    <div><button className="btn btn-success" onClick={() => this.props.history.push('./grantAccess')}> Grant access </button></div> 
-                <button className="btn btn-danger" onClick={() => this.signOut()}>
+
+
+
+        //console.log(user);
+
+        return this.state.status ? (<div>
+            <h3>Welcome back!</h3>
+            <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
+            <div><button className="btn btn-primary" onClick={() => this.props.history.push('./updatePatientHist')}> Update patient history</button></div>
+            <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
+            <div><button className="btn btn-success" onClick={() => this.props.history.push('./grantAccess')}> Grant access </button></div>
+            <button className="btn btn-danger" onClick={() => this.signOut()}>
                 Sign Out
                 </button>
-    
-                </div>);
 
-}
+        </div>) : (<PatientForm onClick={() => this.signOut()} history={this.props.history} />)
+
+
+
+    }
 }
 
 function mapStateToProps(state) {
@@ -54,4 +88,4 @@ function mapStateToProps(state) {
     return {}
 }
 
-export default connect(mapStateToProps, null)(App);
+export default App;
