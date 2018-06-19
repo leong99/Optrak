@@ -144,8 +144,19 @@ class SignUp extends Component {
 
     }
 
+    checkWeb3(callback){
+        web3.eth.getAccounts().then(
+            e => {
+                callback((e.length!==0)); //if this equals 0 that means that the user is not signed into a web3 provider
+            } 
+        ,() => console.log('error') //can implement some other error later
+        )
+        ;
+    }
+
     render() {
-        return (
+        const displayObject = this.checkWeb3(w3Active => { console.log(w3Active); (w3Active) ?
+        (
             <form inline="true">
                 <h3>Register for OpTrak</h3>
                 <div className="form-group">
@@ -183,6 +194,18 @@ class SignUp extends Component {
                 <div>{this.state.error.message}</div>
                 <div><Link to={'/signin'}> Sign in instead </Link> </div>
             </form>
+        ):
+        (
+            <div>
+                Provide a web3 provider
+            </div>
+        )});
+            
+        
+        return (
+            <div>
+            {displayObject}
+            </div>
         );
     }
 }
