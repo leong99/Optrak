@@ -15,8 +15,6 @@ contract Optrak is Ownable {
     mapping(string=>string) patient2pubkey;
     // -------------------- End of Patient Registry ---------------------------
 
-    mapping(string=>mapping(string=>bool)) isProvider; // {provider: {pubkey: patient/provider}}
-
     // -------------------- Shared Meta Data -----------------------------------
     mapping(string=>mapping(string=>string)) provider2meta; // {provider: {type/name: api/pointer}}
     mapping(string=>uint) provider2metaCount;               // {provider: #}
