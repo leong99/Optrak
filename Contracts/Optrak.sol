@@ -11,6 +11,10 @@ contract Optrak is Ownable {
     // mapping(uint=>string) index2provider; // hide this mapping so it's difficult to retrieve providers without index
     // -------------------- End of Provider Registry ---------------------------
     
+    // -------------------- Patient Registry ----------------------------------
+    mapping(string=>string) patient2pubkey;
+    // -------------------- End of Patient Registry ---------------------------
+
     mapping(string=>mapping(string=>bool)) isProvider; // {provider: {pubkey: patient/provider}}
 
     // -------------------- Shared Meta Data -----------------------------------
@@ -34,15 +38,27 @@ contract Optrak is Ownable {
 
     // Function returns a boolean so when interacting with web3 the frontend is aware
     // if a user has already registered or not
-    function addProvider(string provider, string pubkey, bool provStatus) public onlyOwner returns (bool){
+    function addProvider(string provider, string pubkey) public onlyOwner returns (bool){
          
         if (bytes(provider2pubkey[provider]).length <= 0) { //ensures a
          //provider can only register once
          //may need to update when use cases are developed further
             provider2pubkey[provider] = pubkey;
-            isProvider[provider][pubkey] = provStatus;
             return true;
          }
+        return false;
+    }
+
+    // Function returns a boolean so when interacting with web3 the frontend is aware
+    // if a user has already registered or not
+    function addPatient(string patient, string pubkey) public onlyOwner returns (bool){
+
+        if (bytes(patient2pubkey[patient]).length <=0) { //ensures a
+        //patient can only register once
+        //may need to update when use cases are developed further
+            patient2pubkey[patient] = pubkey;
+            return true;
+        }
         return false;
     }
 
