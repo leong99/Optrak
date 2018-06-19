@@ -37,6 +37,7 @@ class SignUp extends Component {
             provStatus: false,
             email: '',
             btnTitle: 'User Type',
+            w3Active: false,
             error: {
                 message: ''
             }
@@ -78,7 +79,7 @@ class SignUp extends Component {
                 const {email, password} = this.state;
                 //current email and password are assumed to be correct at this point due to previous checks in checkFields()
                 firebaseApp.auth().createUserWithEmailAndPassword(email, password).then(() => {
-                    //firebase is used to create a new user with an email and password, making for very easy authentication
+                    //firebase is used to create a new fuser with an email and password, making for very easy authentication
                     console.log(this.state.pubkey);
                     optrakContract.methods.addProvider(this.state.name, this.state.pubkey, this.state.provStatus).send().on('receipt', async(receipt) => {
                         //optrak instance is called upon here to add the current provider
@@ -144,18 +145,14 @@ class SignUp extends Component {
 
     }
 
-    checkWeb3(callback){
-        web3.eth.getAccounts().then(
-            e => {
-                callback((e.length!==0)); //if this equals 0 that means that the user is not signed into a web3 provider
-            } 
-        ,() => console.log('error') //can implement some other error later
-        )
-        ;
-    }
-
     render() {
-        const displayObject = this.checkWeb3(w3Active => { console.log(w3Active); (w3Active) ?
+        const foo =async () =>{
+            let accounts = await web3.eth.getAccounts();
+            console.log(accounts);
+            this.setState({w3Active: (accounts.length !== 0)});
+        }
+        console.log(this.state.w3Active);
+        const displayObject = (this.state.w3Active) ?
         (
             <form inline="true">
                 <h3>Register for OpTrak</h3>
@@ -199,7 +196,7 @@ class SignUp extends Component {
             <div>
                 Provide a web3 provider
             </div>
-        )});
+        );
             
         
         return (
