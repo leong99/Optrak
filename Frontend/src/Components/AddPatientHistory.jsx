@@ -61,6 +61,12 @@ class AddPatientHistory extends Component {
                                     optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Last Refill Date', this.state.userName, true).send().on('receipt', receipt => {
                                         console.log('Access granted to last refill date');
                                         console.log('Last Refill date transaction successfully received');
+                                        firebaseApp.database().ref('Users/' + this.state.userName + '/Patients/' + this.state.patientName).push({
+                                            Dosage: this.state.patientDosage,
+                                            Prescription: this.state.prescription,
+                                            lastPrescribedDate : this.state.lastPrescribedDate,
+                                            lastRefillDate : this.state.lastRefillDate
+                                        })
                                         alert('Patient info added successfully. Returning to main app page');
                                         this.props.history.push('./app');
                                     }).catch(error => {this.setState({error: {message: 'Refill access transaction failed'}})});
@@ -79,6 +85,7 @@ class AddPatientHistory extends Component {
                 
                 
             })
+            
         }
     }
 
