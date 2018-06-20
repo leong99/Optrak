@@ -187,6 +187,7 @@ class UpdatePatientHistory extends Component {
                                 if (bool){
                                     console.log('what');
                                     this.updatePatientHistory();
+                                    this.props.history.push('./app');
                                 }
                                 else{
                                     console.log('Failed');

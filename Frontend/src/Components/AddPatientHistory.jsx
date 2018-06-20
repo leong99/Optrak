@@ -30,63 +30,12 @@ class AddPatientHistory extends Component {
     //But this can be modified easily to fit any data that need be stored on the blockchain
     //Current program assumes 1 opioid prescription to a patient
     addPatientInfo = async() => {
-        
-        //verifies that there are no errors in the inputs of this form
-        if(this.checkFields()) {
-            this.setState({error: {message: 'This will take a minute or two, please be patient'}})
-            //Should implement some kind of loading thing here
-            contract.then(optrakContract => {
-                //contract returns instance of our smart contract as its promise value, makigng us use a .then()
-                optrakContract.methods.addMetaData(this.state.patientName, 'Prescription', this.state.prescription, this.state.overwrite).send().on('receipt', receipt => {
-                   //Creates a transaction on the client side in order to add a certain piece of metadata to a patient
-                    console.log('Prescription metadata successfully added');
-                    //Updates the current provider's metadata access, allowing them to fully see/control a patient's information 
-                    //which they have added
-
-                    //This and all further transactions created fire upon the receipt of the previous transaction being received
-                    //To improve upon this we can find out how to implement these transactions as an atomic unit
-                    optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName, true).send().on('receipt',receipt => {
-                        console.log('Access to this patient\'s prescription metadata granted');
-                        optrakContract.methods.addMetaData(this.state.patientName, 'Dosage', this.state.patientDosage, this.state.overwrite).send().on('receipt', receipt => {
-                            console.log('Dosage metadata successfully added');
-                            optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Dosage', this.state.userName, true).send().on('receipt', receipt => {
-                                 console.log('Access to this patient\'s dosage metadata granted');
-                                 optrakContract.methods.addMetaData(this.state.patientName, 'Last Prescribed Date', this.state.lastPrescribedDate, this.state.overwrite).send()
-                            .on('receipt', receipt => {
-                                console.log('Last prescription date metadata successfully added');
-                                optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Last Prescribed Date', this.state.userName, true).send().on('receipt', receipt => {
-                                    console.log('Access to this patient\'s last prescription date metadata granted');
-                                    optrakContract.methods.addMetaData(this.state.patientName, 'Last Refill Date', this.state.lastRefillDate, this.state.overwrite).send()
-                                .on('receipt', receipt => {
-                                    optrakContract.methods.updateMetaDataAccess(this.state.patientName, 'Last Refill Date', this.state.userName, true).send().on('receipt', receipt => {
-                                        console.log('Access granted to last refill date');
-                                        console.log('Last Refill date transaction successfully received');
-                                        firebaseApp.database().ref('Users/' + this.state.userName + '/Patients/' + this.state.patientName).push({
-                                            Dosage: this.state.patientDosage,
-                                            Prescription: this.state.prescription,
-                                            lastPrescribedDate : this.state.lastPrescribedDate,
-                                            lastRefillDate : this.state.lastRefillDate
-                                        })
-                                        alert('Patient info added successfully. Returning to main app page');
-                                        this.props.history.push('./app');
-                                    }).catch(error => {this.setState({error: {message: 'Refill access transaction failed'}})});
-                                    
-                                }).catch(error => {
-                                    this.setState({error: {message: 'Last refill date transaction failed, please refresh and try again'}});
-                                });
-                                }).catch(error => {this.setState({error: {message: 'Prescription date transaction failed'}})});
-                                
-                            }).catch(error => {this.setState({error: {message: 'Last prescription data transaction failed, refresh and try again'}})});
-                            }).catch(error => {this.setState({error: {message: 'Dosage access transaction failed'}})});  
-                        }).catch(error => {this.setState({error: {message: 'Dosage transaction failed, please refresh and try again'}})});
-                    }).catch(error => {this.setState({error: {message: 'Prescription access transaction failed, please refresh and try again'}})});
-                    
-                }).catch(error => {this.setState({error: {message: 'Prescription transaction failed, please refresh and try again'}})});
-                
-                
-            })
-            
-        }
+        firebaseApp.database().ref('Users/' + this.state.userName + '/Patients/' + this.state.patientName).push({
+            Dosage: this.state.patientDosage,
+            Prescription: this.state.prescription,
+            lastPrescribedDate : this.state.lastPrescribedDate,
+            lastRefillDate : this.state.lastRefillDate
+        })
     }
 
     /**
@@ -133,7 +82,7 @@ class AddPatientHistory extends Component {
                 //makes sure that the current user is signed in befor being able to access this page
             }
             else {
-                console.log(this.state.userName)
+                console.log(this.state.userName);
             }
             
         })
