@@ -66,7 +66,7 @@ class UpdatePatientHistory extends Component {
     updatePatientHistory(){
         console.log('got to the actual method');
         console.log(this.checkFields());
-        if(this.checkFields()){
+        /*if(this.checkFields()){
             contract.then(optrakContract=>{
                 optrakContract.methods.addMetaData(this.state.patientName, 'Prescription', this.state.prescription, true).send()
                 .on('receipt', this.successUpdate('Prescription'))
@@ -85,6 +85,14 @@ class UpdatePatientHistory extends Component {
             if ((/transaction failed, please refresh and try again./).test(this.state.error.message)){
                 this.setState({error: {message: "Information successfully updated."}});
             }
+        }*/
+        if (this.checkFields){
+            firebaseApp.database().ref('Users/' + this.state.userName + '/Patients/' + this.state.patientName).push({
+                Dosage: this.state.patientDosage,
+                Prescription: this.state.prescription,
+                lastPrescribedDate : this.state.lastPrescribedDate,
+                lastRefillDate : this.state.lastRefillDate
+            })
         }
     }
     
