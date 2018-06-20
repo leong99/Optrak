@@ -150,8 +150,11 @@ class SignUp extends Component {
 
     }
 
-    render() {
+    componentWillMount(){
         this.verifyWeb3();
+    }
+
+    render() {
         console.log(this.state.w3Active);
         const displayObject = (this.state.w3Active) ?
         (
@@ -184,7 +187,15 @@ class SignUp extends Component {
                         onChange={event => this.setState({ name: event.target.value })} />
                     <button className="btn btn-primary"
                         type="button"
-                        onClick={() => this.signUp()}
+                        onClick={() => 
+                            {
+                                this.verifyWeb3();
+                                if (this.state.w3Active){
+                                    this.signUp();
+                                }
+                            }
+                        }
+
                     >
                         Complete Registration
                 </button>
@@ -195,7 +206,7 @@ class SignUp extends Component {
         ):
         (
             <div>
-                Provide a web3 provider
+                Provide a web3 provider, then refresh the page
             </div>
         );
             
