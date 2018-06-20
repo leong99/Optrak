@@ -122,7 +122,12 @@ class SignUp extends Component {
     
     }
 
-    
+    verifyWeb3 = async () => {
+        let accounts = await web3.eth.getAccounts();
+        let length = accounts.length;
+        console.log(length);
+        this.setState({w3Active: (length !== 0)});
+    }
 
 
 
@@ -146,11 +151,7 @@ class SignUp extends Component {
     }
 
     render() {
-        const foo =async () =>{
-            let accounts = await web3.eth.getAccounts();
-            console.log(accounts);
-            this.setState({w3Active: (accounts.length !== 0)});
-        }
+        this.verifyWeb3();
         console.log(this.state.w3Active);
         const displayObject = (this.state.w3Active) ?
         (
