@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { firebaseApp } from '../firebase';
+import 'react-dropdown/style.css';
+import { Link, BrowserRouter, Route } from 'react-router-dom';
+import { DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
 
 class AccessData extends Component {
 
@@ -9,18 +12,25 @@ class AccessData extends Component {
             userName: '',
             patientName: '',
             error:{
-                message:''
+                message:'Enter a registered patient'
             }
         };
     }
 
     displayData(userName, patientName){
+        var query=firebaseApp.database().ref(`Users/${this.state.userName}/Patients/${this.state.patientName}`);
+        console.log(query);
+        query.once("value")
+            .then(snapshot => {
+                snapshot.forEach(childSnapshot => console.log(childSnapshot.val(), '\n'));
+            },
+            () => this.setState({error: {message: 'Enter a registered patient'}}));
 
     }
 
     render(){
         console.log(this.state);
-        const displayScreen=(this.state.error.message === '')?
+        const displayScreen=(this.state.error.message === 'Enter a registered patient')?
         (
             <React.Fragment>
                     <h3> Enter patient name </h3>
@@ -36,7 +46,7 @@ class AccessData extends Component {
                         onClick={() => {
                             firebaseApp.auth().onAuthStateChanged(user => {
                                 if(user) {
-                                    this.setState({userName: user});
+                                    this.setState({userName: user.displayName});
                                 }
                             });
                             this.setState({error: {message: `Displaying ${this.state.userName}'s patient ${this.state.patientName}'s data`}});
@@ -48,7 +58,9 @@ class AccessData extends Component {
                 </React.Fragment>
         ):
         (
-            null
+            <div>
+                {this.displayData(this.state.userName, this.state.patientName)}
+            </div>
         );
         return(
             <div>

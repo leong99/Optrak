@@ -49,7 +49,7 @@ ReactDOM.render(
                 <Route path ="/addPatientHist" component={AddPatientHistory}/>
                 <Route path ="/viewPatientHist" component={ViewPatientHistory}/>
                 <Route path ="/grantAccess" component={GrantAccess}/>
-                <Route path='/dataAccess' component={DataAccess}/>
+                <Route path='/accessData' component={AccessData}/>
 
             </div>
         </BrowserRouter>
