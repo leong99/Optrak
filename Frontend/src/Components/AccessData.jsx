@@ -17,15 +17,27 @@ class AccessData extends Component {
         };
     }
 
-    displayData(userName, patientName){
+    queryData(userName, patientName){
         var query=firebaseApp.database().ref(`Users/${this.state.userName}/Patients/${this.state.patientName}`);
         console.log(query);
+        var dataArr=new Array();
         query.once("value")
-            .then(snapshot => {
-                snapshot.forEach(childSnapshot => console.log(childSnapshot.val(), '\n'));
+            .then(async snapshot => {
+                await snapshot.forEach(childSnapshot => {(dataArr.unshift(childSnapshot.val()))});
             })
             .catch(() => this.setState({error: {message: 'Unexpected error'}}));
+            console.log(dataArr);
+            return dataArr;
+    }
 
+    displayData(dataArr){
+        const list=dataArr.map( obj => {
+            Object.keys(obj).map(key => {
+                <li> {obj[key]} </li>
+            })
+        });
+        console.log(list);
+        return list;
     }
 
     render(){
@@ -43,13 +55,13 @@ class AccessData extends Component {
                             placeholder="Name" />
                     </FormGroup>{' '}
                     <Button
-                        onClick={() => {
-                            firebaseApp.auth().onAuthStateChanged(user => {
+                        onClick={ ()  => {
+                            firebaseApp.auth().onAuthStateChanged(async user => {
                                 if(user) {
-                                    this.setState({userName: user.displayName});
+                                    await this.setState({userName: user.displayName});
+                                    this.setState({error: {message: `Displaying ${this.state.userName}'s patient ${this.state.patientName}'s data`}});
                                 }
                             });
-                            this.setState({error: {message: `Displaying ${this.state.userName}'s patient ${this.state.patientName}'s data`}});
                         }}
                         type="submit"
                     >
@@ -59,7 +71,7 @@ class AccessData extends Component {
         ):
         (
             <div>
-                {this.displayData(this.state.userName, this.state.patientName)}
+            {this.displayData(this.queryData(this.state.userName, this.state.patientName))}
             </div>
         );
         return(
