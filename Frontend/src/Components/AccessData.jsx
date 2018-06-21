@@ -23,8 +23,8 @@ class AccessData extends Component {
         query.once("value")
             .then(snapshot => {
                 snapshot.forEach(childSnapshot => console.log(childSnapshot.val(), '\n'));
-            },
-            () => this.setState({error: {message: 'Enter a registered patient'}}));
+            })
+            .catch(() => this.setState({error: {message: 'Unexpected error'}}));
 
     }
 
