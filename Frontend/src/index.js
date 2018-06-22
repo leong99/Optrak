@@ -10,6 +10,7 @@ import AddPatientHistory from './Components/AddPatientHistory';
 import ViewPatientHistory from './Components/ViewPatientHistory';
 import GrantAccess from './Components/GrantAccess';
 import AccessData from './Components/AccessData';
+import RenderPatients from './Components/RenderPatients';
 import {BrowserRouter, Route, browserHistory, withRouter} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
@@ -50,6 +51,7 @@ ReactDOM.render(
                 <Route path ="/viewPatientHist" component={ViewPatientHistory}/>
                 <Route path ="/grantAccess" component={GrantAccess}/>
                 <Route path='/accessData' component={AccessData}/>
+                <Route path='/renderPatients' component={RenderPatients}/>
 
             </div>
         </BrowserRouter>
