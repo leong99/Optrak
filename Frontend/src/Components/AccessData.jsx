@@ -17,25 +17,21 @@ class AccessData extends Component {
         };
     }
 
-    queryData(userName, patientName){
+    async queryData(userName, patientName){
         var query=firebaseApp.database().ref(`Users/${this.state.userName}/Patients/${this.state.patientName}`);
-        console.log(query);
         var dataArr=new Array();
-        query.once("value")
+        await query.once("value")
             .then(async snapshot => {
-                await snapshot.forEach(childSnapshot => {(dataArr.unshift(childSnapshot.val()))});
+                await snapshot.forEach(childSnapshot => {dataArr.unshift(childSnapshot.val()); console.log(1);});
             })
             .catch(() => this.setState({error: {message: 'Unexpected error'}}));
-            console.log(dataArr);
-            return dataArr;
+        console.log(dataArr);
+        return dataArr;
     }
 
-    displayData(dataArr){
-        const list=dataArr.map( obj => {
-            Object.keys(obj).map(key => {
-                <li> {obj[key]} </li>
-            })
-        });
+    async displayData(dataArr){
+        dataArr=await dataArr;
+        var list=await dataArr.map(e => e.Prescription);
         console.log(list);
         return list;
     }
@@ -71,7 +67,9 @@ class AccessData extends Component {
         ):
         (
             <div>
-            {this.displayData(this.queryData(this.state.userName, this.state.patientName))}
+            <React.Fragment>
+            {(this.displayData(this.queryData(this.state.userName, this.state.patientName)))}
+            </React.Fragment>
             </div>
         );
         return(
