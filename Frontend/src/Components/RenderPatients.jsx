@@ -17,31 +17,21 @@ class RenderPatients extends Component {
                 message: ''
             }
         }
-
-
     }
 
     async queryData(userName){
-        var query=firebaseApp.database().ref(`Users/${this.state.userName}`);
+        var query=firebaseApp.database().ref(`Users/${this.state.userName}/Patients`);
         var dataArr=new Array();
+        var self=this;
         await query.once("value")
             .then(async snapshot => {
-                await snapshot.forEach(childSnapshot => {dataArr.unshift(childSnapshot.val()); console.log(1);});
+                await snapshot.forEach(childSnapshot => {dataArr.unshift(childSnapshot.key); console.log(1);});
             })
             .catch(() => this.setState({error: {message: 'Unexpected error'}}));
         console.log(dataArr);
         return dataArr;
     }
 
-    displayData(array){
-        var list;
-        console.log(array);
-        for (var item in array){
-            list+=<li> {item} </li>;
-        }
-        console.log(list, 'list is here');
-        return list;
-    }
 
     componentDidMount() {
         //best way to get the current user's name and save it
@@ -50,29 +40,37 @@ class RenderPatients extends Component {
                    await this.setState({ userName: user.displayName });
                 }
             })
+            
     }
 
     render(){
-        console.log(this.state);    
-        firebaseApp.auth().onAuthStateChanged(user => {
-            if (!user) {
-                this.props.history.push('./signin');
-            }
-        })
-        if (this.state.userName !== ''){
-            console.log('test');
-            var patientArr=async () => await this.queryData(this.state.userName);
-        }
-        const displayObject=(this.state.userName === '')?
-        (
-            null
-        ):
-        (
-            <div> {this.displayData(patientArr)} </div>
-        );
         return(
             <div>
-            {displayObject}
+                {(this.state.userName==='')?
+                (
+                    null
+                ):
+                (
+                    (this.queryData(this.state.userName).then(e =>{
+                        console.log(e)
+                        e.map(name =>{
+                            <React.Fragment>
+                            <div> Patient Name: {name} </div>
+                            <Button
+                            onClick={ () => {
+                                //TODO: REDIRECT
+                            
+                            }
+                        }
+                            type="submit"
+                        >
+                            View information
+                            </Button>
+                            </React.Fragment>
+                        }
+                )
+
+                })))}
             <div> {this.state.error.message} </div>
             <div><Link to="./app"> Back to main page </Link> </div>
             </div>
