@@ -7,55 +7,40 @@ import { DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, B
 import Web3 from 'web3';
 import { contract } from './SignUp';
 
-//Displays patient's associated information
-function PatientForm(props) {
-    if (props.clicked) {
-        return (
-            <div>
-                <h1>{props.patientName}</h1>
-                <div>
-                    <h4> Latest Prescription: {props.prescribedOpioid} </h4>
-                    <div>
-                        <h4> Patient Dosage: {props.patientDosage} </h4>
-                        <div>
-                            <h4> Last Refill Date: {props.lastRefillDate} </h4>
-                            <div>
-                                <h4> Last prescribed date: {props.lastPrescribedDate}</h4>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        )
-    }
-    else {
-        return null;
-    }
-
-}
 
 class RenderPatients extends Component {
     constructor(props) {
         super(props);
         this.state = {
             userName: '',
-            patientName: '',
-            sentName: '',
-            patientDosage: '',
-            prescribedOpioid: '',
-            lastRefillDate: '',
-            lastPrescribedDate: '',
-            clicked: false,
             error: {
                 message: ''
-            },
-            isMounted: false,
-            status: false
+            }
         }
 
 
+    }
+
+    async queryData(userName){
+        var query=firebaseApp.database().ref(`Users/${this.state.userName}`);
+        var dataArr=new Array();
+        await query.once("value")
+            .then(async snapshot => {
+                await snapshot.forEach(childSnapshot => {dataArr.unshift(childSnapshot.val()); console.log(1);});
+            })
+            .catch(() => this.setState({error: {message: 'Unexpected error'}}));
+        console.log(dataArr);
+        return dataArr;
+    }
+
+    displayData(array){
+        var list;
+        console.log(array);
+        for (var item in array){
+            list+=<li> {item} </li>;
+        }
+        console.log(list, 'list is here');
+        return list;
     }
 
     componentDidMount() {
@@ -68,13 +53,29 @@ class RenderPatients extends Component {
     }
 
     render(){
+        console.log(this.state);    
         firebaseApp.auth().onAuthStateChanged(user => {
             if (!user) {
                 this.props.history.push('./signin');
             }
         })
+        if (this.state.userName !== ''){
+            console.log('test');
+            var patientArr=async () => await this.queryData(this.state.userName);
+        }
+        const displayObject=(this.state.userName === '')?
+        (
+            null
+        ):
+        (
+            <div> {this.displayData(patientArr)} </div>
+        );
         return(
-            <div> Test </div>
+            <div>
+            {displayObject}
+            <div> {this.state.error.message} </div>
+            <div><Link to="./app"> Back to main page </Link> </div>
+            </div>
         )
     }
 }
