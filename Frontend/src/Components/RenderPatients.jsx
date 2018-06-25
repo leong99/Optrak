@@ -13,6 +13,7 @@ class RenderPatients extends Component {
         super(props);
         this.state = {
             userName: '',
+            patients: '',
             error: {
                 message: ''
             }
@@ -32,45 +33,43 @@ class RenderPatients extends Component {
         return dataArr;
     }
 
+    renderPatientList = async () =>{
+        try{
+            let patientArr = await this.queryData(this.state.userName);
+            this.setState({
+                patients: patientArr.map((name, index) => {
+                    <li key={index} className= "list-group-item">{name}</li>
+                })
+            });
+        }
+        catch (err){
+            console.log(err);
+            this.setState({error: {message: err}});
+        }
+    }
+
 
     componentDidMount() {
         //best way to get the current user's name and save it
             firebaseApp.auth().onAuthStateChanged(async user => {
                 if (user) {
+                    console.log('got here');
                    await this.setState({ userName: user.displayName });
+                   console.log('real check');
                 }
             })
+            if(this.state.userName !== ''){
+                this.renderPatientList();
+                console.log(this.state);
+            }
             
     }
 
     render(){
+        console.log(this.state);
         return(
             <div>
-                {(this.state.userName==='')?
-                (
-                    null
-                ):
-                (
-                    (this.queryData(this.state.userName).then(e =>{
-                        console.log(e)
-                        e.map(name =>{
-                            <React.Fragment>
-                            <div> Patient Name: {name} </div>
-                            <Button
-                            onClick={ () => {
-                                //TODO: REDIRECT
-                            
-                            }
-                        }
-                            type="submit"
-                        >
-                            View information
-                            </Button>
-                            </React.Fragment>
-                        }
-                )
-
-                })))}
+                {this.state.patients}
             <div> {this.state.error.message} </div>
             <div><Link to="./app"> Back to main page </Link> </div>
             </div>
