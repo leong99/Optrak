@@ -38,7 +38,7 @@ class RenderPatients extends Component {
             let patientArr = await this.queryData(this.state.userName);
             this.setState({
                 patients: patientArr.map((name, index) => {
-                    <li key={index} className= "list-group-item">{name}</li>
+                    return <li key={index} className= "list-group-item">{name}</li>
                 })
             });
         }
@@ -53,15 +53,15 @@ class RenderPatients extends Component {
         //best way to get the current user's name and save it
             firebaseApp.auth().onAuthStateChanged(async user => {
                 if (user) {
-                    console.log('got here');
+                console.log('got here');
                    await this.setState({ userName: user.displayName });
-                   console.log('real check');
+                   console.log(this.state.userName, 'real check');
+                   this.renderPatientList();
+                    console.log(this.state);
                 }
             })
-            if(this.state.userName !== ''){
-                this.renderPatientList();
-                console.log(this.state);
-            }
+                
+            
             
     }
 
