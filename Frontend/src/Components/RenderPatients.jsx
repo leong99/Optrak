@@ -38,7 +38,7 @@ class RenderPatients extends Component {
             let patientArr = await this.queryData(this.state.userName);
             this.setState({
                 patients: patientArr.map((name, index) => {
-                    return <li key={index} className= "list-group-item">{name}</li>
+                    return <li key={index} className= "list-group-item">{name} <Button onClick ={null /*put blockchain link here*/} type="submit"> View Patient </Button></li>
                 })
             });
         }
