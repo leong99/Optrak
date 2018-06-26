@@ -14,64 +14,78 @@ class RenderPatients extends Component {
         this.state = {
             userName: '',
             patients: '',
+            patientInfo: '',
+            clicked: false,
             error: {
                 message: ''
             }
         }
     }
 
-    async queryData(userName){
-        var query=firebaseApp.database().ref(`Users/${this.state.userName}/Patients`);
-        var dataArr=new Array();
-        var self=this;
+    async queryData(userName) {
+        var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients`);
+        var dataArr = new Array();
+        var self = this;
         await query.once("value")
             .then(async snapshot => {
-                await snapshot.forEach(childSnapshot => {dataArr.unshift(childSnapshot.key); console.log(1);});
+                await snapshot.forEach(childSnapshot => { dataArr.unshift(childSnapshot.key); console.log(1); });
             })
-            .catch(() => this.setState({error: {message: 'Unexpected error'}}));
+            .catch(() => this.setState({ error: { message: 'Unexpected error' } }));
         console.log(dataArr);
         return dataArr;
     }
 
-    renderPatientList = async () =>{
-        try{
+    renderPatientList = async () => {
+        try {
             let patientArr = await this.queryData(this.state.userName);
             this.setState({
                 patients: patientArr.map((name, index) => {
-                    return <li key={index} className= "list-group-item">{name} <Button onClick ={null /*put blockchain link here*/} type="submit"> View Patient </Button></li>
+                    return <li key={index} className="list-group-item">{name} <Button onClick={null /*put blockchain link here*/} type="submit"> View Patient </Button></li>
                 })
             });
         }
-        catch (err){
+        catch (err) {
             console.log(err);
-            this.setState({error: {message: err}});
+            this.setState({ error: { message: err } });
         }
     }
 
 
     componentDidMount() {
         //best way to get the current user's name and save it
-            firebaseApp.auth().onAuthStateChanged(async user => {
-                if (user) {
+        firebaseApp.auth().onAuthStateChanged(async user => {
+            if (user) {
                 console.log('got here');
-                   await this.setState({ userName: user.displayName });
-                   console.log(this.state.userName, 'real check');
-                   this.renderPatientList();
-                    console.log(this.state);
-                }
-            })
-                
-            
-            
+                await this.setState({ userName: user.displayName });
+                console.log(this.state.userName, 'real check');
+                this.renderPatientList();
+                console.log(this.state);
+            }
+        })
+
+
+
     }
 
-    render(){
+    render() {
         console.log(this.state);
-        return(
+        const displayScreen = (this.state.clicked) ?
+            (
+                <div>
+                    {this.state.patientInfo}
+                </div>
+            )
+            :
+            (
+                <div>
+                    {this.state.patients}
+                </div>
+            )
+        return (
             <div>
-                {this.state.patients}
-            <div> {this.state.error.message} </div>
-            <div><Link to="./app"> Back to main page </Link> </div>
+                {displayScreen}
+                <div> {this.state.error.message} </div>
+                <div><Link to="./app"> Back to main page </Link> </div>
             </div>
         )
     }
