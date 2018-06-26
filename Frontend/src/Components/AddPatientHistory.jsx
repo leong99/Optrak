@@ -92,7 +92,7 @@ class AddPatientHistory extends Component {
                     <div className="form-group">
                         <input type="text" placeholder="Enter Patient Name (Name on Records)" className="form-control" style={{ marginRight: '5px' }}
                             onChange={event => this.setState({ patientName: event.target.value })} />
-                        <input type="text" placeholder="Enter Patient's Unique ID" className="form-control" style={{ marginRight: '5px' }}
+                        <input type="number" placeholder="Enter Patient's Unique ID" className="form-control" style={{ marginRight: '5px' }}
                             onChange={event => this.setState({ uid: event.target.value })} />
                         <button className="btn btn-success" type="button" onClick={() => { this.addPatientInfo() }}>
                             Submit

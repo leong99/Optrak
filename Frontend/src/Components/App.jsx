@@ -35,11 +35,11 @@ class App extends Component {
         firebaseApp.auth().onAuthStateChanged(async user => {
             if (user) {
                 await this.setState({ userName: user.displayName });
-                contract.then(optrakContract => {
+                /*contract.then(optrakContract => {
                     optrakContract.methods.getProviderInfo(this.state.userName, optrakContract.options.from).call().then(provStatus => {
                         this.setState({ status: provStatus });
                     })
-                })
+                })*/
             }
         })
 
@@ -66,7 +66,7 @@ class App extends Component {
 
         //console.log(user);
 
-        return this.state.status ? (<div>
+        return (<div>
             <h3>Welcome back!</h3>
             <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
             <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
@@ -74,8 +74,7 @@ class App extends Component {
             <button className="btn btn-danger" onClick={() => this.signOut()}>
                 Sign Out
                 </button>
-
-        </div>) : (<PatientForm onClick={() => this.signOut()} history={this.props.history} />)
+                </div>)
 
 
 
