@@ -22,30 +22,71 @@ class RenderPatients extends Component {
         }
     }
 
-    async queryData(userName) {
-        var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients`);
+    //This method queries the list of patients and converts it into an array
+    //pre: username parameter is the username of the provider whose patients we want to query
+    //post: returns array (as result of promise) of provider's patients
+    async queryPatients(userName) {
+        var query = firebaseApp.database().ref(`Users/${userName}/Patients`);
         var dataArr = new Array();
-        var self = this;
         await query.once("value")
             .then(async snapshot => {
-                await snapshot.forEach(childSnapshot => { dataArr.unshift(childSnapshot.key); console.log(1); });
+                await snapshot.forEach(childSnapshot => { dataArr.unshift(childSnapshot.key) });
             })
             .catch(() => this.setState({ error: { message: 'Unexpected error' } }));
         console.log(dataArr);
         return dataArr;
     }
 
-    renderPatientList = async () => {
+    //This method queries the data of a particular patient and converts it into an array
+    //pre: patientName parameter is the name of the patient under the provider (here as username) whose data we want to query
+    //post: returns array (as result of promise) of the patient's data
+    async queryPatientData(userName, patientName) {
+        var query = firebaseApp.database().ref(`Users/${userName}/Patients/${patientName}`);
+        var dataArr = new Array();
+        await query.once("value")
+            .then(async snapshot => {
+                await snapshot.forEach(childSnapshot => { dataArr.unshift(childSnapshot.val()) });
+            })
+            .catch(() => this.setState({ error: { message: 'Unexpected error' } }));
+        console.log(dataArr);
+        return dataArr;
+    }
+
+    //This method converts the array of patients into a list whose buttons access each patient's data
+    //pre: pantientsList parameter is the array of patients of the provider
+    //post: returns list of patients with buttons that redirect to displaying their data
+    renderPatientList = async (patientsList) => {
         try {
-            let patientArr = await this.queryData(this.state.userName);
+            let patientArr = await patientsList;
             this.setState({
                 patients: patientArr.map((name, index) => {
-                    return <li key={index} className="list-group-item">{name} <Button onClick={null /*put blockchain link here*/} type="submit"> View Patient </Button></li>
+                    return <li key={index} className="list-group-item">{name} <Button onClick={() => { this.setState({ clicked: true }); this.displayPatientData(this.queryPatientData(this.state.userName, name)); }} type="submit"> View Patient Info </Button> </li>
                 })
             });
         }
         catch (err) {
             console.log(err);
+            this.setState({ error: { message: err } });
+        }
+    }
+
+    //This method converts an array of a particular patient's data into a list
+    //pre: patientData parameter is the array of data of a particular patient
+    //post: returns list of patient data
+    async displayPatientData(patientData) {
+        try {
+            var patientList = await patientData;
+            var index = 0;
+            this.setState({
+                patientInfo: patientList.map((obj) => {
+                    return Object.keys(obj).map((key) => {
+                        index++;
+                        return <li key={index} className="list-group-item"> {key}: {obj[key]} </li>;
+                    });
+                })
+            })
+        }
+        catch (err) {
             this.setState({ error: { message: err } });
         }
     }
@@ -58,7 +99,7 @@ class RenderPatients extends Component {
                 console.log('got here');
                 await this.setState({ userName: user.displayName });
                 console.log(this.state.userName, 'real check');
-                this.renderPatientList();
+                this.renderPatientList(this.queryPatients(this.state.userName));
                 console.log(this.state);
             }
         })
@@ -73,6 +114,13 @@ class RenderPatients extends Component {
             (
                 <div>
                     {this.state.patientInfo}
+                    <Button
+                        onClick={() => {
+                            this.setState({ clicked: false });
+                        }
+                        } type="submit">
+                        View Another Patient
+                        </Button>
                 </div>
             )
             :

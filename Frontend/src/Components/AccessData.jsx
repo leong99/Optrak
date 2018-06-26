@@ -24,7 +24,7 @@ class AccessData extends Component {
         var dataArr = new Array();
         await query.once("value")
             .then(async snapshot => {
-                await snapshot.forEach(childSnapshot => { dataArr.unshift(childSnapshot.val()); console.log(1); });
+                await snapshot.forEach(childSnapshot => { dataArr.unshift(childSnapshot.val()) });
             })
             .catch(() => this.setState({ error: { message: 'Unexpected error' } }));
         console.log(dataArr);
@@ -32,8 +32,8 @@ class AccessData extends Component {
     }
 
     async displayPatients() {
-        var patientList = await this.queryData(this.state.userName);
         try {
+            var patientList = await this.queryData(this.state.userName);
             var index=0;
             this.setState({
                 patients: patientList.map((obj) => {

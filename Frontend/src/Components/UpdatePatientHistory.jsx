@@ -206,12 +206,12 @@ class UpdatePatientHistory extends Component {
         
 
         return (
-            <div>
-                {displayScreen}
-                <div>{this.state.error.message}</div>
-                <div><Link to="./app"> Go back to main page </Link></div>
+                <div>
+                    {displayScreen}
+                    <div>{this.state.error.message}</div>
+                    <div><Link to="./app"> Go back to main page </Link></div>
 
-            </div>
+                </div>
             
 
         )
