@@ -55,7 +55,7 @@ class RenderPatients extends Component {
     //This method converts the array of patients into a list whose buttons access each patient's data
     //pre: pantientsList parameter is the array of patients of the provider
     //post: returns list of patients with buttons that redirect to displaying their data
-    renderPatientList = async (patientsList) => {
+    async renderPatientList(patientsList) {
         try {
             let patientArr = await patientsList;
             this.setState({
