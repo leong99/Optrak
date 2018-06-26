@@ -45,7 +45,7 @@ class GrantAccess extends Component {
     async grantAccess(e, accessReq) {
         e.preventDefault();
         if (this.checkFields()) {
-            if (this.isPatient() && this.state.status) {
+            /*if (this.isPatient() && this.state.status) {
                 console.log('Made it this far');
                 contract.then(optrakContract => {
                     optrakContract.methods.getMetaDataAccess(this.state.patientName, 'Prescription', this.state.userName).call()
@@ -87,8 +87,8 @@ class GrantAccess extends Component {
                             }
                         }).catch(error => { error: { message: 'Something went wrong. Please refresh and try again' } })
                 })
-            }
-        } else if (this.isProvider() && !this.state.status) {
+            }*/
+        } if (this.isProvider()) {
             contract.then(optrakContract => {
                 //This command grants the accessor access to a given patient's database 'link'
                 //Link will be created dynamically upon request to access
@@ -101,7 +101,10 @@ class GrantAccess extends Component {
                 await query.once("value").then(async (snapshot) => {
                     let child = await snapshot.child(this.state.patientName);
                     let val = await child.val();
-                    await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/`).push(val);
+                    await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).set(val);
+                    console.log(val);
+                    console.log(child);
+                    //await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).push(val);
                 })
 
             }
@@ -110,8 +113,8 @@ class GrantAccess extends Component {
     }
     isPatient() {
         contract.then(optrakContract => {
-            optrakContract.methods.getProviderMetaCount(this.state.patientName).call().then(metaCount => {
-                if (metaCount < 2) {
+            optrakContract.methods.getPatientProvider(this.state.patientName, this.state.uid).call().then(provider => {
+                if (!provider) {
                     //A patient has to have at least 2 pieces of metadata in order to actually exist e.g Prescription and Dosage
                     this.setState({ error: { message: 'The given patient\'s information does not exist. Please double check your spelling.' } });
                     this.setState({ clicked: false });
@@ -127,10 +130,11 @@ class GrantAccess extends Component {
         contract.then(optrakContract => {
             optrakContract.methods.getProviderPubkey(this.state.accessor).call().then(pubkey => {
                 if (pubkey.length < 2) {
+                    console.log(pubkey);
                     this.setState({ error: { message: 'This provider does not exist, please double check spelling' } });
                     this.setState({ clicked: false });
                 } else {
-                    optrakContract.methods.getMetaDataAccess(this.state.userName, 'Prescription', this.state.accessor).call().then(access => {
+                    optrakContract.methods.getMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor).call().then(access => {
                         if (!access) {
                             this.setState({ error: { message: 'This provider does not have access to your information' } });
                         }
@@ -175,7 +179,7 @@ class GrantAccess extends Component {
                 <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
                     onChange={event => this.setState({ patientName: event.target.value.trim() })} />
                 <input type="password" placeholder="Enter patient's assigned unique ID" className="form-control" style={{ marginRight: '5px' }}
-                    onChange={event => this.setState({ uid: event.target.value.trim })} />
+                    onChange={event => this.setState({ uid: event.target.value.trim() })} />
                 <button className="btn btn-warning" onClick={e => this.grantAccess(e, false)}> Revoke Access </button>
                 <button className="btn btn-success" onClick={e => this.grantAccess(e, true)}> Grant Access </button>
             </form>
