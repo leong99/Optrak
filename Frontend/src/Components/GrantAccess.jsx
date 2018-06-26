@@ -20,6 +20,7 @@ class GrantAccess extends Component {
             prescribedOpioid: '',
             lastRefillDate: '',
             lastPrescribedDate: '',
+            uid: '',
             error: {
                 message: ''
             },
@@ -29,11 +30,19 @@ class GrantAccess extends Component {
 
     }
 
+    componentDidMount() {
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if(user) {
+                this.setState({userName: user.displayName});
+            }
+        })
+    }
+
 
     //If you're reading through this function, I apologize. Until I figure out how to fire the transactions as an atomic unit then 
     //This is the only way to ensure that every single transaction successfully fires, and that the others aren't triggered unless all 
     //prior transactions have been successful.
-    grantAccess(e, accessReq) {
+    async grantAccess(e, accessReq) {
         e.preventDefault();
         if (this.checkFields()) {
             if (this.isPatient() && this.state.status) {
@@ -83,10 +92,20 @@ class GrantAccess extends Component {
             contract.then(optrakContract => {
                 //This command grants the accessor access to a given patient's database 'link'
                 //Link will be created dynamically upon request to access
-                optrakContract.methods.updateMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor).send().catch(error => {
-                    this.setState({error: {message: 'Access to patient not granted'}});
+                optrakContract.methods.updateMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor, this.state.uid, accessReq).send().catch(error => {
+                    this.setState({ error: { message: 'Access to patient not granted' } });
                 })
             })
+            if (accessReq) {
+                var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
+                await query.once("value").then(async (snapshot) => {
+                    let child = await snapshot.child(this.state.patientName);
+                    let val = await child.val();
+                    await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/`).push(val);
+                })
+
+            }
+
         }
     }
     isPatient() {
@@ -126,11 +145,6 @@ class GrantAccess extends Component {
         firebaseApp.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ userName: user.displayName });
-                contract.then(optrakContract => {
-                    optrakContract.methods.getProviderInfo(this.state.userName, optrakContract.options.from).call().then(provStatus => {
-                        this.setState({ status: provStatus });
-                    })
-                })
             }
         })
         if (this.state.patientName === '') {
@@ -152,31 +166,23 @@ class GrantAccess extends Component {
                 this.props.history.push('./signin');
             }
         })
-        return this.state.status ?
-            (<div>
-                <h3>Grant patient access to another provider</h3>
-                <form inline="true">
-                    <input type="text" placeholder="Enter desired accessor" className="form-control" style={{ marginRight: '5px' }}
-                        onChange={event => this.setState({ accessor: event.target.value.trim() })} />
-                    <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
-                        onChange={event => this.setState({ patientName: event.target.value.trim() })} />
-                    <button className="btn btn-success" onClick={e => this.grantAccess(e, true)}> Submit </button>
-                </form>
-                <div>{this.state.error.message}</div>
-                <div><Link to='./app'> Go back to main app </Link></div>
-            </div>)
-            : (<div>
-                <h3> Grant or revoke access from a healthcare provider </h3>
-                <form inline="true">
-                    <input type="text" placeholder="Enter desired/undesired accessor" className="form-control" style={{ marginRight: '5px' }}
-                        onChange={event => this.setState({ accessor: event.target.value.trim() })} />
-                    <div>
-                        <button className="btn btn-success" onClick={e => this.grantAccess(e, true)}> Submit </button>
-                        <button className="btn btn-warning" onClick={e => this.grantAccess(e, false)}> Revoke Access </button>
-                    </div>
-                    <div><Link to="./app"> Return to main app </Link></div>
-                </form>
-            </div>)
+        return(
+        <div>
+            <h3>Grant patient access to another provider</h3>
+            <form inline="true">
+                <input type="text" placeholder="Enter desired accessor" className="form-control" style={{ marginRight: '5px' }}
+                    onChange={event => this.setState({ accessor: event.target.value.trim() })} />
+                <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
+                    onChange={event => this.setState({ patientName: event.target.value.trim() })} />
+                <input type="password" placeholder="Enter patient's assigned unique ID" className="form-control" style={{ marginRight: '5px' }}
+                    onChange={event => this.setState({ uid: event.target.value.trim })} />
+                <button className="btn btn-warning" onClick={e => this.grantAccess(e, false)}> Revoke Access </button>
+                <button className="btn btn-success" onClick={e => this.grantAccess(e, true)}> Grant Access </button>
+            </form>
+            <div>{this.state.error.message}</div>
+            <div><Link to='./app'> Go back to main app </Link></div>
+        </div>)
+
     }
 }
 
