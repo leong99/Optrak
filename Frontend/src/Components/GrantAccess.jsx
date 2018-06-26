@@ -81,18 +81,11 @@ class GrantAccess extends Component {
             }
         } else if (this.isProvider() && !this.state.status) {
             contract.then(optrakContract => {
-                optrakContract.methods.updateMetaDataAccess(this.state.userName, 'Prescription', this.state.accessor, accessReq).send().on('receipt', receipt => {
-                    console.log('Access granted or revoked to prescription metadata');
-                    optrakContract.methods.updateMetaDataAccess(this.state.userName, 'Dosage', this.state.accessor, accessReq).send().on('receipt', receipt => {
-                        console.log('Access granted or revoked to dosage metadata');
-                        optrakContract.methods.updateMetaDataAccess(this.state.userName, 'Last Prescription Date', this.state.accessor, accessReq).send().on('receipt', receipt => {
-                            console.log('Access granted or revoked to last prescription date metadata');
-                            optrakContract.methods.updateMetaDataAccess(this.state.userName, 'Last Refill Date', this.state.accessor, accessReq).send().on('receipt', receipt => {
-                                console.log('Access granted or revoked to last refill date metadata');
-                            }).catch(error => this.setState({ error: { message: 'Access updating for Last Refill Date Failed' } }));
-                        }).catch(error => this.setState({ error: { message: 'Access updating for Last Prescription Date failed' } }));
-                    }).catch(error => this.setState({ error: { message: 'Access updating for dosage failed' } }));
-                }).catch(error => this.setState({ error: { message: 'Access updating for PRESCRIPTION failed' } }));
+                //This command grants the accessor access to a given patient's database 'link'
+                //Link will be created dynamically upon request to access
+                optrakContract.methods.updateMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor).send().catch(error => {
+                    this.setState({error: {message: 'Access to patient not granted'}});
+                })
             })
         }
     }
