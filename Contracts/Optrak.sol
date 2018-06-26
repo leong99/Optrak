@@ -29,7 +29,11 @@ contract Optrak is Ownable {
     mapping(string=>mapping(string=>mapping(string=>bool))) metadata2access; // {provider1:{metaname: {provider2: bool}}}
     // -------------------- End of Meta Data Access ----------------------------
 
-   
+    //Event fired whenever a patient is added to the registry
+    event PatientAdded(string patientId, string patientName, uint timeStamp);
+
+    event InformationShared(string patientId, string patientName, string sharer, string sharee, uint timeStamp);
+
 
     function getProviderPubkey(string provider) public view returns(string) {
         // string storage provider = index2provider[index];
@@ -58,6 +62,7 @@ contract Optrak is Ownable {
         //patient can only register once
         //may need to update when use cases are developed further
             patientRegistry[patient][uid] = pubkey;
+            emit PatientAdded(uid, patient, now);
             return true;
         }
         return false;
@@ -105,6 +110,7 @@ contract Optrak is Ownable {
         bytes memory tempExistingMeta = bytes(getMetaData(sharer, metaName));
         if (tempExistingMeta.length == 0) return false;
         metadata2access[sharer][metaName][sharee] = access;
+        emit InformationShared(metaName, , sharer, sharee, now);
         return true;
     }
 
