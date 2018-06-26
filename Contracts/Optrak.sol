@@ -106,12 +106,20 @@ contract Optrak is Ownable {
         return metadata2access[provider1][patientName][provider2];
     }
 
-    function updateMetaDataAccess(string sharer, string metaName, string sharee, bool access) public onlyOwner returns(bool) {
+    function getPatientProvider(string patientName, string uid) public view returns(string) {
+        return (patientRegistry[patientName][uid]);
+    }
+
+    function updateMetaDataAccess(string sharer, string metaName, string sharee, string uid, bool access) public onlyOwner returns(bool) {
         bytes memory tempExistingMeta = bytes(getMetaData(sharer, metaName));
         if (tempExistingMeta.length == 0) return false;
-        metadata2access[sharer][metaName][sharee] = access;
-        emit InformationShared(metaName, , sharer, sharee, now);
-        return true;
+        if(keccak256(bytes(getProviderPubkey(sharer))) == keccak256(bytes(patientRegistry[metaName][uid]))) {
+            metadata2access[sharer][metaName][sharee] = access;
+            emit InformationShared(metaName, uid, sharer, sharee, now);
+            return true;
+        }
+        return false;
+        
     }
 
 }
