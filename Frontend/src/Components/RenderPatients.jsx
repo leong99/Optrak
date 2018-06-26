@@ -60,7 +60,7 @@ class RenderPatients extends Component {
             let patientArr = await patientsList;
             this.setState({
                 patients: patientArr.map((name, index) => {
-                    return <li key={index} className="list-group-item">{name} <Button className="btn btn-info" onClick={() => { this.displayPatientData(this.queryPatientData(this.state.userName, name)); this.setState({ clicked: true }); }} type="submit"> View Patient Info </Button> </li>
+                    return <li key={index} className="list-group-item">{name} <Button className="btn btn-info" onClick={async () => { await this.displayPatientData(this.queryPatientData(this.state.userName, name)); this.setState({ clicked: true }); }} type="submit"> View Patient Info </Button> </li>
                 })
             });
         }
@@ -99,7 +99,7 @@ class RenderPatients extends Component {
                 console.log('got here');
                 await this.setState({ userName: user.displayName });
                 console.log(this.state.userName, 'real check');
-                this.renderPatientList(this.queryPatients(this.state.userName));
+                await this.renderPatientList(this.queryPatients(this.state.userName));
                 console.log(this.state);
             }
         })
