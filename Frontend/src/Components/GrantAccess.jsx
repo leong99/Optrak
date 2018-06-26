@@ -108,6 +108,17 @@ class GrantAccess extends Component {
                 })
 
             }
+            else {
+                var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
+                await query.once("value").then(async (snapshot) => {
+                    let child = await snapshot.child(this.state.patientName);
+                    let val = await child.val();
+                    await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).remove();
+                    console.log(val);
+                    console.log(child);
+                    //await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).push(val);
+                })
+            }
 
         }
     }
