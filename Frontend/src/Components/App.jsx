@@ -69,7 +69,6 @@ class App extends Component {
         return this.state.status ? (<div>
             <h3>Welcome back!</h3>
             <div><button className="btn btn-info" onClick={() => this.props.history.push('./addPatientHist')}> Add patient history</button></div>
-            <div><button className="btn btn-primary" onClick={() => this.props.history.push('./updatePatientHist')}> Update patient history</button></div>
             <div><button className="btn btn-warning" onClick={() => this.props.history.push('./viewPatientHist')}>View patient history</button></div>
             <div><button className="btn btn-success" onClick={() => this.props.history.push('./grantAccess')}> Grant access </button></div>
             <button className="btn btn-danger" onClick={() => this.signOut()}>
