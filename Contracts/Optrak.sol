@@ -12,7 +12,8 @@ contract Optrak is Ownable {
     // -------------------- End of Provider Registry ---------------------------
     
     // -------------------- Patient Registry ----------------------------------
-    mapping(string=>string) patient2pubkey;
+    mapping(string=>mapping(string=>string)) patientRegistry;
+    
     // -------------------- End of Patient Registry ---------------------------
 
     // -------------------- Shared Meta Data -----------------------------------
@@ -27,6 +28,8 @@ contract Optrak is Ownable {
     // -------------------- Meta Data Access------- ----------------------------
     mapping(string=>mapping(string=>mapping(string=>bool))) metadata2access; // {provider1:{metaname: {provider2: bool}}}
     // -------------------- End of Meta Data Access ----------------------------
+
+   
 
     function getProviderPubkey(string provider) public view returns(string) {
         // string storage provider = index2provider[index];
@@ -49,16 +52,18 @@ contract Optrak is Ownable {
 
     // Function returns a boolean so when interacting with web3 the frontend is aware
     // if a user has already registered or not
-    function addPatient(string patient, string pubkey) public onlyOwner returns (bool){
+    function addPatient(string patient, string pubkey, string uid) public onlyOwner returns (bool){
 
-        if (bytes(patient2pubkey[patient]).length <=0) { //ensures a
+        if (bytes(patientRegistry[patient][uid]).length <=0) { //ensures a
         //patient can only register once
         //may need to update when use cases are developed further
-            patient2pubkey[patient] = pubkey;
+            patientRegistry[patient][uid] = pubkey;
             return true;
         }
         return false;
     }
+
+
 
     function getProviderMetaCount(string provider) public view returns(uint) {
         return provider2metaCount[provider];
@@ -90,6 +95,10 @@ contract Optrak is Ownable {
 
     function getMetaDataAccess(string sharer, string metaName, string sharee) public view returns(bool) {
         return metadata2access[sharer][metaName][sharee];
+    }
+
+    function getPatientAccess(string provider1, string provider2, string patientName) public view returns (bool) {
+        return metadata2access[provider1][patientName][provider2];
     }
 
     function updateMetaDataAccess(string sharer, string metaName, string sharee, bool access) public onlyOwner returns(bool) {
