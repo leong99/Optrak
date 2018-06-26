@@ -60,7 +60,7 @@ class RenderPatients extends Component {
             let patientArr = await patientsList;
             this.setState({
                 patients: patientArr.map((name, index) => {
-                    return <li key={index} className="list-group-item">{name} <Button onClick={() => { this.setState({ clicked: true }); this.displayPatientData(this.queryPatientData(this.state.userName, name)); }} type="submit"> View Patient Info </Button> </li>
+                    return <li key={index} className="list-group-item">{name} <Button className="btn btn-info" onClick={() => { this.displayPatientData(this.queryPatientData(this.state.userName, name)); this.setState({ clicked: true }); }} type="submit"> View Patient Info </Button> </li>
                 })
             });
         }
@@ -115,10 +115,11 @@ class RenderPatients extends Component {
                 <div>
                     {this.state.patientInfo}
                     <Button
+                        className="btn btn-warning"
                         onClick={() => {
-                            this.setState({ clicked: false });
+                            this.setState({ clicked: false }); //changes render to list of patients for that user
                         }
-                        } type="submit">
+                        }    type="submit">
                         View Another Patient
                         </Button>
                 </div>
