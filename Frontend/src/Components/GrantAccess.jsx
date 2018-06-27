@@ -32,8 +32,8 @@ class GrantAccess extends Component {
 
     componentDidMount() {
         firebaseApp.auth().onAuthStateChanged(user => {
-            if(user) {
-                this.setState({userName: user.displayName});
+            if (user) {
+                this.setState({ userName: user.displayName });
             }
         })
     }
@@ -92,33 +92,35 @@ class GrantAccess extends Component {
             contract.then(optrakContract => {
                 //This command grants the accessor access to a given patient's database 'link'
                 //Link will be created dynamically upon request to access
-                optrakContract.methods.updateMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor, this.state.uid, accessReq).send().catch(error => {
-                    this.setState({ error: { message: 'Access to patient not granted' } });
-                })
-            })
-            if (accessReq) {
-                var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
-                await query.once("value").then(async (snapshot) => {
-                    let child = await snapshot.child(this.state.patientName);
-                    let val = await child.val();
-                    await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).set(val);
-                    console.log(val);
-                    console.log(child);
-                    //await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).push(val);
-                })
+                optrakContract.methods.updateMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor, this.state.uid, accessReq).send()
+                    .on('receipt', receipt => {
+                        if (accessReq) {
+                            var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
+                            await query.once("value").then(async (snapshot) => {
+                                let child = await snapshot.child(this.state.patientName);
+                                let val = await child.val();
+                                await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).set(val);
+                                console.log(val);
+                                console.log(child);
 
-            }
-            else {
-                var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
-                await query.once("value").then(async (snapshot) => {
-                    let child = await snapshot.child(this.state.patientName);
-                    let val = await child.val();
-                    await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).remove();
-                    console.log(val);
-                    console.log(child);
-                    //await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).push(val);
-                })
-            }
+                            })
+
+                        }
+                        else {
+                            var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
+                            await query.once("value").then(async (snapshot) => {
+                                let child = await snapshot.child(this.state.patientName);
+                                let val = await child.val();
+                                await firebaseApp.database().ref(`Users/${this.state.accessor}/Patients/` + this.state.patientName).remove();
+                                console.log(val);
+                                console.log(child);
+
+                            })
+                        }
+                    }).catch(error => {
+                        this.setState({ error: { message: 'Access to patient not granted' } });
+                    })
+            })
 
         }
     }
@@ -181,22 +183,22 @@ class GrantAccess extends Component {
                 this.props.history.push('./signin');
             }
         })
-        return(
-        <div>
-            <h3>Grant patient access to another provider</h3>
-            <form inline="true">
-                <input type="text" placeholder="Enter desired accessor" className="form-control" style={{ marginRight: '5px' }}
-                    onChange={event => this.setState({ accessor: event.target.value.trim() })} />
-                <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
-                    onChange={event => this.setState({ patientName: event.target.value.trim() })} />
-                <input type="password" placeholder="Enter patient's assigned unique ID" className="form-control" style={{ marginRight: '5px' }}
-                    onChange={event => this.setState({ uid: event.target.value.trim() })} />
-                <button className="btn btn-warning" onClick={e => this.grantAccess(e, false)}> Revoke Access </button>
-                <button className="btn btn-success" onClick={e => this.grantAccess(e, true)}> Grant Access </button>
-            </form>
-            <div>{this.state.error.message}</div>
-            <div><Link to='./app'> Go back to main app </Link></div>
-        </div>)
+        return (
+            <div>
+                <h3>Grant patient access to another provider</h3>
+                <form inline="true">
+                    <input type="text" placeholder="Enter desired accessor" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ accessor: event.target.value.trim() })} />
+                    <input type="text" placeholder="Enter patient to share" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ patientName: event.target.value.trim() })} />
+                    <input type="password" placeholder="Enter patient's assigned unique ID" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ uid: event.target.value.trim() })} />
+                    <button className="btn btn-warning" onClick={e => this.grantAccess(e, false)}> Revoke Access </button>
+                    <button className="btn btn-success" onClick={e => this.grantAccess(e, true)}> Grant Access </button>
+                </form>
+                <div>{this.state.error.message}</div>
+                <div><Link to='./app'> Go back to main app </Link></div>
+            </div>)
 
     }
 }
