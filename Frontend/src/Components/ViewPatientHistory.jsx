@@ -7,7 +7,7 @@ import { DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, B
 import Web3 from 'web3';
 import { contract } from './SignUp';
 import jwt from 'jsonwebtoken';
-const EXPIRYTIME = '30s';
+const EXPIRYTIME = '1m';
 
 
 class ViewPatientHistory extends Component {
@@ -103,6 +103,7 @@ class ViewPatientHistory extends Component {
             if (err){
                 console.log('error occured verifying');
                 this.setState({patientInfo: ''});
+                this.setState({error: {message: 'Error occured authenticating JSON web token. Token has either timed out, or the key provided is incorrect.'}})
                 //Should also change the rendering screen based on whether token was properly verified or not
             }
             else{
@@ -115,7 +116,8 @@ class ViewPatientHistory extends Component {
                         index++;
                         return <li key={index} className="list-group-item"> {key}: {obj[key]} </li>;
                     });
-                })})
+                })});
+                this.setState({error: {message: ''}});
             }
         })
     }
