@@ -9,6 +9,7 @@ import UpdatePatientHistory from './Components/UpdatePatientHistory';
 import AddPatientHistory from './Components/AddPatientHistory';
 import ViewPatientHistory from './Components/ViewPatientHistory';
 import GrantAccess from './Components/GrantAccess';
+import ViewLog from './Components/ViewLog';
 import Temp from './Components/Temp';
 import {BrowserRouter, Route, browserHistory, withRouter} from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -49,6 +50,7 @@ ReactDOM.render(
                 <Route path ="/addPatientHist" component={AddPatientHistory}/>
                 <Route path ="/viewPatientHist" component={ViewPatientHistory}/>
                 <Route path ="/grantAccess" component={GrantAccess}/>
+                <Route path ="/viewLog" component={ViewLog}/>
                 <Route path="/temp" component={Temp}/>
             </div>
         </BrowserRouter>
