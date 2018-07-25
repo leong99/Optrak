@@ -7,7 +7,7 @@ import { DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, B
 import Web3 from 'web3';
 import { contract } from './SignUp';
 import jwt from 'jsonwebtoken';
-const EXPIRYTIME = '1m';
+const EXPIRYTIME = '30s';
 
 
 class ViewPatientHistory extends Component {
@@ -80,15 +80,9 @@ class ViewPatientHistory extends Component {
     async displayPatientData(patientData) {
         try {
             var patientList = await patientData;
-            var index = 0;
             var token = jwt.sign(
                 {
-                    patientInfo: patientList.map((obj) => {
-                        return Object.keys(obj).map((key) => {
-                            index++;
-                            return <li key={index} className="list-group-item"> {key}: {obj[key]} </li>;
-                        });
-                    })
+                    patientInfo: patientList
                 },
                 'foo',
                 { expiresIn: EXPIRYTIME }
@@ -108,11 +102,20 @@ class ViewPatientHistory extends Component {
             console.log(this.state.jsonToken, this.state.signedKey);
             if (err){
                 console.log('error occured verifying');
+                this.setState({patientInfo: ''});
                 //Should also change the rendering screen based on whether token was properly verified or not
             }
             else{
                 console.log('ran properly');
-                console.log(await decoded.patientInfo);
+                var patientArr = await decoded.patientInfo;
+                console.log(patientArr);
+                var index = 0;
+                this.setState({patientInfo: patientArr.map((obj) => {
+                    return Object.keys(obj).map((key) => {
+                        index++;
+                        return <li key={index} className="list-group-item"> {key}: {obj[key]} </li>;
+                    });
+                })})
             }
         })
     }
