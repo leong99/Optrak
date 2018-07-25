@@ -6,6 +6,8 @@ import { Link, BrowserRouter, Route } from 'react-router-dom';
 import { DropdownButton, MenuItem, Form, FormGroup, FormControl, ControlLabel, Button, Checkbox } from 'react-bootstrap';
 import Web3 from 'web3';
 import { contract } from './SignUp';
+import jwt from 'jsonwebtoken';
+const EXPIRYTIME = '1m';
 
 
 class ViewPatientHistory extends Component {
@@ -18,7 +20,9 @@ class ViewPatientHistory extends Component {
             clicked: false,
             error: {
                 message: ''
-            }
+            },
+            jsonToken: '',
+            signedKey: ''
         }
     }
 
@@ -77,18 +81,40 @@ class ViewPatientHistory extends Component {
         try {
             var patientList = await patientData;
             var index = 0;
-            this.setState({
-                patientInfo: patientList.map((obj) => {
-                    return Object.keys(obj).map((key) => {
-                        index++;
-                        return <li key={index} className="list-group-item"> {key}: {obj[key]} </li>;
-                    });
-                })
-            })
+            var token = jwt.sign(
+                {
+                    patientInfo: patientList.map((obj) => {
+                        return Object.keys(obj).map((key) => {
+                            index++;
+                            return <li key={index} className="list-group-item"> {key}: {obj[key]} </li>;
+                        });
+                    })
+                },
+                'foo',
+                { expiresIn: EXPIRYTIME }
+            )
+            this.setState({ jsonToken: token });
+            console.log(token);
         }
         catch (err) {
             this.setState({ error: { message: err } });
         }
+    }
+
+    //Decodes token using secret key
+    verifyToken(e){
+        e.preventDefault();
+        jwt.verify(this.state.jsonToken, this.state.signedKey, async (err, decoded) => {
+            console.log(this.state.jsonToken, this.state.signedKey);
+            if (err){
+                console.log('error occured verifying');
+                //Should also change the rendering screen based on whether token was properly verified or not
+            }
+            else{
+                console.log('ran properly');
+                console.log(await decoded.patientInfo);
+            }
+        })
     }
 
 
@@ -112,6 +138,7 @@ class ViewPatientHistory extends Component {
         console.log(this.state);
         const displayScreen = (this.state.clicked) ?
             (
+                <React.Fragment>
                 <div>
                     {this.state.patientInfo}
                     <Button
@@ -119,10 +146,26 @@ class ViewPatientHistory extends Component {
                         onClick={() => {
                             this.setState({ clicked: false }); //changes render to list of patients for that user
                         }
-                        }    type="submit">
+                        } type="submit"
+                        >
                         View Another Patient
                         </Button>
                 </div>
+
+                
+
+                <div>
+                <h3>Grant patient access to another provider</h3>
+                <form inline="true">
+                    {/*<input type="text" placeholder="Enter token" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ jsonToken: event.target.value.trim() })} />*/}
+                    <input type="text" placeholder="Enter secret key" className="form-control" style={{ marginRight: '5px' }}
+                        onChange={event => this.setState({ signedKey: event.target.value.trim() })} />
+                    <button className="btn btn-warning" onClick={e => this.verifyToken(e)}> Verify Token </button>
+                    
+                </form>
+                </div>
+                </React.Fragment>
             )
             :
             (

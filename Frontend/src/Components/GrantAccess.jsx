@@ -93,7 +93,7 @@ class GrantAccess extends Component {
                 //This command grants the accessor access to a given patient's database 'link'
                 //Link will be created dynamically upon request to access
                 optrakContract.methods.updateMetaDataAccess(this.state.userName, this.state.patientName, this.state.accessor, this.state.uid, accessReq).send()
-                    .on('receipt', receipt => {
+                    .on('receipt', async receipt => {
                         if (accessReq) {
                             var query = firebaseApp.database().ref(`Users/${this.state.userName}/Patients/`);
                             await query.once("value").then(async (snapshot) => {
